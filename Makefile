@@ -1,0 +1,158 @@
+# Copyright (C) 2020 Intel Corporation
+# Licensed subject to the terms of the separately executed evaluation license agreement between Intel Corporation and you.
+
+# WIP for transfering tutorial steps to makefile
+
+whl = dist/tfedlrn-0.0.0-py3-none-any.whl
+tfl = venv/lib/python3.5/site-packages/tfedlrn
+
+col_num ?= 0
+framework_name ?= tensorflow
+model_name ?= keras_cnn
+use_gpu ?= false
+dataset ?= mnist
+
+ifeq ($(use_gpu), true)
+	base_image = tensorflow/tensorflow:1.14.0-gpu-py3
+	device = gpu
+	runtime_line = --runtime nvidia
+else
+	base_image = ubuntu:18.04
+	device = cpu
+endif
+
+ifeq ($(dataset),brats)
+    additional_brats_container_lines = \
+	-v '<SYMLINK_DIR>/$(col_num)':/home/$(shell whoami)/tfl/datasets/brats:ro \
+    -v '<BRATS_DIR>':<BRATS_DIR>:ro
+endif
+
+
+
+full_hostname = $(shell hostname).$(shell hostname -d)
+
+.PHONY: ca
+ca: bin/federations/certs/test/ca.crt bin/federations/certs/test/ca.key
+
+.PHONY: local_certs
+local_certs: bin/federations bin/federations/certs/test bin/federations/certs/test/local.csr bin/federations/certs/test/local.crt
+
+.PHONY: wheel
+wheel: $(whl)
+
+.PHONY: install
+install: $(tfl)
+
+.PHONY: venv
+venv: venv/bin/python3
+
+venv/bin/python3:
+	python3.5 -m venv venv
+	venv/bin/pip3 install --upgrade pip
+	venv/bin/pip3 install --upgrade setuptools
+	venv/bin/pip3 install --upgrade wheel
+	
+$(whl): venv/bin/python3
+	venv/bin/python3 setup.py bdist_wheel
+	# we will use the wheel, and do not want the egg info
+	rm -r -f tfedlrn.egg-info
+
+$(tfl): $(whl)
+	venv/bin/pip3 install $(whl)
+	
+uninstall:
+	venv/bin/pip3 uninstall -y tfedlrn
+	rm -rf dist
+	rm -rf build
+
+.PHONY: reinstall
+reinstall: uninstall install
+
+bin/federations/certs/test:
+	mkdir -p bin/federations/certs/test
+
+bin/federations/weights/keras_cnn_mnist_init.pbuf:
+	echo "recipe needed!"
+
+bin/federations/certs/test/ca.key:
+	openssl genrsa -out bin/federations/certs/test/ca.key 3072
+
+bin/federations/certs/test/ca.crt: bin/federations/certs/test/ca.key
+	openssl req -new -x509 -key bin/federations/certs/test/ca.key -out bin/federations/certs/test/ca.crt -subj "/CN=Trusted Federated Learning Test Cert Authority"
+
+bin/federations/certs/test/local.key:
+	openssl genrsa -out bin/federations/certs/test/local.key 3072
+
+bin/federations/certs/test/local.csr: bin/federations/certs/test/local.key
+	openssl req -new -key bin/federations/certs/test/local.key -out bin/federations/certs/test/local.csr -subj /CN=$(full_hostname)
+
+bin/federations/certs/test/local.crt: bin/federations/certs/test/local.csr bin/federations/certs/test/ca.crt
+	openssl x509 -req -in bin/federations/certs/test/local.csr -CA bin/federations/certs/test/ca.crt -CAkey bin/federations/certs/test/ca.key -CAcreateserial -out bin/federations/certs/test/local.crt
+
+clean:
+	rm -r -f venv
+	rm -r -f dist
+	rm -r -f build
+	rm -r -f bin/federations/certs/test/*
+
+
+# ADDING TUTORIAL TARGETS
+
+build_containers:
+	docker build \
+	--build-arg BASE_IMAGE=$(base_image) \
+	--build-arg http_proxy \
+	--build-arg https_proxy \
+	--build-arg socks_proxy \
+	--build-arg ftp_proxy \
+	--build-arg no_proxy \
+	--build-arg UID=$(shell id -u) \
+	--build-arg GID=$(shell id -g) \
+	--build-arg UNAME=$(shell whoami) \
+	-t tfl_agg_$(model_name)_$(shell whoami):0.1 \
+	-f Dockerfile \
+	.
+
+	docker build --build-arg whoami=$(shell whoami) \
+	--build-arg use_gpu=$(use_gpu) \
+	-t tfl_col_$(device)_$(model_name)_$(shell whoami):0.1 \
+	-f ./models/$(framework_name)/$(model_name)/$(device).dockerfile \
+	.
+
+run_agg_container:
+
+	docker run \
+	--net=host \
+	-it --name=tfl_agg_$(model_name)_$(shell whoami) \
+	--rm \
+	-w /home/$(shell whoami)/tfl/bin \
+	-v $(shell pwd)/bin/federations:/home/$(shell whoami)/tfl/bin/federations:rw \
+	$(additional_brats_container_lines) \
+	tfl_agg_$(model_name)_$(shell whoami):0.1 \
+	bash 
+
+run_col_container:
+
+	docker run \
+	$(runtime_line) \
+	--net=host \
+	-it --name=tfl_col_$(device)_$(model_name)_$(shell whoami)_$(col_num) \
+	--rm \
+	-v $(shell pwd)/bin/federations:/home/$(shell whoami)/tfl/bin/federations:ro \
+	$(additional_brats_container_lines) \
+	-w /home/$(shell whoami)/tfl/bin \
+	tfl_col_$(device)_$(model_name)_$(shell whoami):0.1 \
+	bash 
+
+
+
+
+	
+
+
+
+
+
+
+
+

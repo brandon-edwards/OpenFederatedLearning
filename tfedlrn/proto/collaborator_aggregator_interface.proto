@@ -1,0 +1,107 @@
+// Copyright (C) 2020 Intel Corporation
+// Licensed subject to the terms of the separately executed evaluation license agreement between Intel Corporation and you.
+
+syntax = 'proto3';
+
+package tfedlrn_proto;
+
+// we start with everything as "required" while developing / debugging. This forces correctness better.
+// FIXME: move to "optional" once development is complete
+
+service Aggregator {
+    rpc RequestJob(JobRequest) returns (JobReply) {}
+    rpc DownloadModel(ModelDownloadRequest) returns (GlobalModelUpdate) {}
+    rpc UploadLocalModelUpdate(LocalModelUpdate) returns (LocalModelUpdateAck) {}
+    rpc UploadLocalMetricsUpdate(LocalValidationResults) returns (LocalValidationResultsAck) {}
+}
+
+
+enum Job {
+    JOB_TRAIN = 0;
+    JOB_VALIDATE = 1;
+    JOB_YIELD = 2;
+    JOB_QUIT = 3;
+    JOB_DOWNLOAD_MODEL = 4;
+}
+
+// FIXME: Remove values or rename npbytes as values.
+message TensorProto {
+    string name = 1;
+    repeated int32 shape = 2;
+    repeated float values = 3;
+    bytes npbytes = 4;
+}
+
+// Everything but 'sender' is effectively just for sanity checking during testing
+message MessageHeader {
+    string sender = 1;
+    string recipient = 2;
+    string federation_id = 3;
+    // FIXME: really a nonce
+    int32 counter = 4; // FIXME: better sanity check device?
+}
+
+message ModelHeader {
+    string id = 1;
+    // FIXME: is this version or rounds trained? We need to know rounds trained somewhere, and this currently does track that
+    int32 version = 2;
+}
+
+message ModelProto {
+    ModelHeader header = 1;
+    repeated TensorProto tensors = 2;
+}
+
+// COLLABORATOR MESSAGES
+
+message LocalModelUpdate {
+    MessageHeader header = 1;
+    ModelProto model = 2;
+    int32 data_size = 3;
+    // map<string, float> loss = 4;
+    float loss = 4;
+}
+
+message LocalValidationResults {
+    MessageHeader header = 1;
+    ModelHeader model_header = 2;
+    // Python Dictionary
+    // map<string, float> results = 3;
+    float results =3;
+    int32 data_size = 4;
+}
+
+message JobRequest {
+    MessageHeader header = 1;
+    ModelHeader model_header = 2;
+}
+
+message ModelDownloadRequest {
+    MessageHeader header = 1;
+    ModelHeader model_header = 2;
+}
+
+message RoundTaskQuery {
+    MessageHeader header = 1;
+    map<string, int32> task_results_last_sync = 2;
+}
+
+// AGGREGATOR MESSAGES
+
+message GlobalModelUpdate {
+    MessageHeader header = 1;
+    ModelProto model = 2;
+}
+
+message JobReply {
+    MessageHeader header = 1;
+    Job job = 2;
+}
+
+message LocalModelUpdateAck {
+    MessageHeader header = 1;
+}
+
+message LocalValidationResultsAck {
+    MessageHeader header = 1;
+}

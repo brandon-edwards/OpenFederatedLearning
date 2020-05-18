@@ -1,0 +1,46 @@
+# Copyright (C) 2020 Intel Corporation
+# Licensed subject to the terms of the separately executed evaluation license agreement between Intel Corporation and you.
+
+version: 1
+
+formatters:
+  simple:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  error:
+    format: "%(levelname)s <PID %(process)d:%(processName)s> %(name)s.%(funcName)s(): %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
+  agg_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: simple
+    filename: ./logs/aggregator.log
+    maxBytes: 10000000
+    backupCount: 20
+    encoding: utf8
+  col_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: simple
+    filename: ./logs/collaborator.log
+    maxBytes: 10000000
+    backupCount: 20
+    encoding: utf8
+
+loggers:
+  tfedlrn.aggregator:
+    level: DEBUG
+    handlers: [console, agg_file_handler]
+    propagate: yes
+  tfedlrn.collaborator:
+    level: DEBUG
+    handlers: [console, col_file_handler]
+    propagate: yes
+  root:
+    level: DEBUG
+    handlers: [console]
