@@ -40,7 +40,7 @@ federation:
   polling_interval: &polling_interval 4
   rounds_to_train: &rounds_to_train 30
   agg_id: &agg_id 'agg_0'
-  agg_addr: &agg_addr "spr-gpu01.jf.intel.com"
+  agg_addr: &agg_addr "<URL HERE>"
   agg_port: &agg_port 8878
   col_ids: &col_ids
     - 'col_one_big'
@@ -57,8 +57,10 @@ aggregator:
   fed_id: *fed_id
   col_ids: *col_ids
   rounds_to_train: *rounds_to_train
+  test_mode_whitelist:
+    - <test_machine_name1>
+    - <test_machine_name2>
 
-  
 collaborator:
   agg_id : *agg_id
   fed_id : *fed_id
@@ -72,7 +74,5 @@ data:
   percent_train: 0.8
   batch_size: 64
 
-hostnames:
-  __DEFAULT_HOSTNAME__: some.url
-
+  
 
