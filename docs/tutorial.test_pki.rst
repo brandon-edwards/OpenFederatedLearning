@@ -140,3 +140,43 @@ Create the root-ca and signing cert
   (base)
   
 4. **For each test machine you want to run collaborators on**, we create a collaborator cert, replacing TEST.MACHINE.NAME with the actual test machine name. This does not have to be the FQDN:
+
+
+.. code-block:: console
+
+  $ bash create-collaborator.sh -c TEST.MACHINE.NAME
+  Generating a RSA private key
+  .................................................+++++
+  .................+++++
+  writing new private key to 'TEST.MACHINE.NAME.key'
+  -----
+  req: Skipping unknown attribute "WD"
+  Using configuration from config/signing-ca.conf
+  Check that the request matches the signature
+  Signature ok
+  Certificate Details:
+          Serial Number: 4 (0x4)
+          Validity
+              Not Before: May 22 18:00:34 2020 GMT
+              Not After : May 22 18:00:34 2021 GMT
+          Subject:
+              commonName                = TEST.MACHINE.NAME
+          X509v3 extensions:
+              X509v3 Basic Constraints:
+                  CA:FALSE
+              X509v3 Authority Key Identifier:
+                  keyid:FE:86:D8:25:97:B3:C5:A3:3D:8C:5C:2A:7D:99:84:25:19:DE:0C:A4
+
+              X509v3 Key Usage: critical
+                  Digital Signature, Key Encipherment
+              X509v3 Extended Key Usage:
+                  TLS Web Client Authentication
+              X509v3 Subject Key Identifier:
+                  BB:FB:75:2D:79:93:78:FC:78:03:32:DE:53:1F:99:85:C7:37:01:F3
+              X509v3 Subject Alternative Name:
+                  DNS:spr-gpu01.jf.intel.com
+  Certificate is to be certified until May 22 18:00:34 2021 GMT (365 days)
+
+  Write out database with 1 new entries
+  Data Base Updated
+  (base)
