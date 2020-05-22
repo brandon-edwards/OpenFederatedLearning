@@ -132,7 +132,6 @@ Create the root-ca and signing cert
               X509v3 Subject Key Identifier:
                   43:C6:30:45:1B:51:60:74:2B:11:C1:CE:B0:DC:84:6A:50:A7:7E:FE
               X509v3 Subject Alternative Name:
-                  DNS:spr-gpu01.jf.intel.com
   Certificate is to be certified until May 22 17:51:52 2021 GMT (365 days)
 
   Write out database with 1 new entries
@@ -174,7 +173,6 @@ Create the root-ca and signing cert
               X509v3 Subject Key Identifier:
                   BB:FB:75:2D:79:93:78:FC:78:03:32:DE:53:1F:99:85:C7:37:01:F3
               X509v3 Subject Alternative Name:
-                  DNS:spr-gpu01.jf.intel.com
   Certificate is to be certified until May 22 18:00:34 2021 GMT (365 days)
 
   Write out database with 1 new entries
