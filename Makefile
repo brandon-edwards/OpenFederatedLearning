@@ -125,7 +125,7 @@ run_agg_container:
 
 	@echo "Aggregator Container started."
 	@echo "Run the command: ./run_mnist_aggregator.sh"
-	docker run \
+	@docker run \
 	--net=host \
 	-it --name=tfl_agg_$(model_name)_$(shell whoami) \
 	--rm \
@@ -139,7 +139,7 @@ run_col_container:
 
 	@echo "Collaborator $(col_num) started. You are in the Docker container"
 	@echo "Run the command: ./run_mnist_collaborator.sh $(col_num)"
-	docker run \
+	@docker run \
 	$(runtime_line) \
 	--net=host \
 	-it --name=tfl_col_$(device)_$(model_name)_$(shell whoami)_$(col_num) \
