@@ -9,7 +9,7 @@ model_name ?= keras_cnn
 use_gpu ?= false
 dataset ?= mnist
 python_version ?= python3.6
-mount_type ?= ro
+mount_type ?= rw
 
 whl = dist/tfedlrn-0.0.0-py3-none-any.whl
 tfl = venv/lib/$(python_version)/site-packages/tfedlrn
@@ -25,8 +25,8 @@ endif
 
 ifeq ($(dataset),brats)
     additional_brats_container_lines = \
-	-v '<SYMLINK_DIR>/$(col_num)':/home/$(shell whoami)/tfl/datasets/brats:$(mount_type) \
-    -v '<BRATS_DIR>':<BRATS_DIR>:$(mount_type)
+	-v '<SYMLINK_DIR>/$(col_num)':/home/$(shell whoami)/tfl/datasets/brats:ro \
+    -v '<BRATS_DIR>':<BRATS_DIR>:ro
 endif
 
 
