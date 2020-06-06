@@ -130,7 +130,7 @@ run_agg_container:
 	-it --name=tfl_agg_$(model_name)_$(shell whoami) \
 	--rm \
 	-w /home/$(shell whoami)/tfl/bin \
-	-v $(shell pwd)/bin/federations:/home/$(shell whoami)/tfl/bin/federations:rw \
+	-v $(shell pwd)/bin/federations:/home/$(shell whoami)/tfl/bin/federations:$(mount_type) \
 	$(additional_brats_container_lines) \
 	tfl_agg_$(model_name)_$(shell whoami):0.1 \
 	bash -c "echo \"export PS1='\e[0;31m[FL Docker for \e[0;32mAggregator\e[0;31m \w$]\e[m >> '\" >> ~/.bashrc && bash" 
@@ -144,7 +144,7 @@ run_col_container:
 	--net=host \
 	-it --name=tfl_col_$(device)_$(model_name)_$(shell whoami)_$(col_num) \
 	--rm \
-	-v $(shell pwd)/bin/federations:/home/$(shell whoami)/tfl/bin/federations:ro \
+	-v $(shell pwd)/bin/federations:/home/$(shell whoami)/tfl/bin/federations:$(mount_type) \
 	$(additional_brats_container_lines) \
 	-w /home/$(shell whoami)/tfl/bin \
 	tfl_col_$(device)_$(model_name)_$(shell whoami):0.1 \
