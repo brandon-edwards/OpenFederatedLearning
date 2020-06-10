@@ -183,3 +183,12 @@ Create the root-ca and signing cert
   Write out database with 1 new entries
   Data Base Updated
 
+5. Once you have the certificates created, you need to move the certs to the correct machines and ensure each machine has the cert_chain.crt needed to verify cert signatures. For example, on a test machine named TEST_MACHINE that you want to be able to run as a collaborator, you should have:
+  * bin/federations/pki/cert_chain.crt
+  * bin/federations/pki/col_TEST_MACHINE/col_TEST_MACHINE.crt
+  * bin/federations/pki/col_TEST_MACHINE/col_TEST_MACHINE.key
+
+While on an machine you want to run as an aggregator with FQDN AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME, you should have:
+  * bin/federations/pki/cert_chain.crt
+  * bin/federations/pki/agg_AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME/agg_AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME.crt
+  * bin/federations/pki/agg_AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME/agg_AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME.key
