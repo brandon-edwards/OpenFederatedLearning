@@ -138,7 +138,7 @@ run_agg_container:
 run_col_container:
 
 	@echo "Collaborator $(col_num) container started. You are in the Docker container"
-	@echo "Run the command: python3 run_collaborator_from_flplan.py -p keras_cnn_mnist_2.yaml -col $(col_num) -dc docker_data_config.yaml"
+	@echo "Run the command: python3 run_collaborator_from_flplan.py -p keras_cnn_mnist_2.yaml -col col_$(col_num) -dc docker_data_config.yaml"
 	@docker run \
 	$(runtime_line) \
 	--net=host \
