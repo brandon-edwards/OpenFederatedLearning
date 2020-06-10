@@ -11,4 +11,4 @@ ENV KMP_BLOCKTIME=30
 ENV KMP_SETTINGS=1
 ENV KMP_AFFINITY=granularity=fine,verbose,compact,1,0
 
-RUN pip3 install intel-tensorflow==1.14.0;
+RUN pip3 install intel-tensorflow==1.15.2
