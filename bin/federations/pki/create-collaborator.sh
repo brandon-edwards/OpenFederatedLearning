@@ -1,31 +1,43 @@
-# ensure we are in the pki directory
-cd $(dirname $0)
+#!/bin/bash
+function valid_fqdn()
+{
+    local fqdn=$1
+    local stat=0
+    result=`echo $fqdn | grep -P '(?=^.{1,254}$)(^(?>(?!\d+\.)[a-zA-Z0-9_\-]{1,63}\.?)+(?:[a-zA-Z]{2,})$)'`
+    if [[ -z "$result" ]]
+    then
+        stat=1
+    fi
+    return $stat
+}
 
-# default common_name to hostname.domainname
-common_name=$(hostname).$(hostname -d)
-subject_alt_name=DNS:$common_name
+if [ "$#" -ne 1 ];
+then
+    echo "Usage: create-collaborator FQDN/CN"
+    exit 1;
+fi
 
-while getopts ":c:s:i:" opt; do
-  case $opt in
-    c) common_name="$OPTARG"
-    ;;
-    s) subject_alt_name=$subject_alt_name,DNS:"$OPTARG"
-    ;;
-    i) subject_alt_name=$subject_alt_name,IP:$OPTARG
-    ;;
-    \?) echo "Invalid option -$OPTARG" >&2
-    ;;
-  esac
-done
+FQDN=$1
+subject_alt_name="DNS:$FQDN"
 
-echo $subject_alt_name
+if valid_fqdn $FQDN; 
+then 
+    echo "Valid FQDN";
+    extensions="client_reqext_san"
+else 
+    echo "Note: collaborator CN is not a valid FQDN and will not be added to the DNS entry of the subject alternative names";
+    extensions="client_reqext"
+fi
 
-SAN=$subject_alt_name openssl req -new -config config/client.conf -out $common_name.csr -keyout $common_name.key -subj "/CN=$common_name/WD=123456"
-openssl ca -config config/signing-ca.conf -batch -in $common_name.csr -out $common_name.crt
+FQDN=$1
 
-filename_base=col_$common_name
+fname="col_$FQDN"
 
-mkdir -p $filename_base
-mv $common_name.crt $filename_base/$filename_base.crt
-mv $common_name.key $filename_base/$filename_base.key
-rm $common_name.csr
+echo "Creating collaborator key pair with following settings: CN=$FQDN SAN=$subject_alt_name"
+
+SAN=$subject_alt_name openssl req -new -config config/client.conf -out $fname.csr -keyout $fname.key -subj "/CN=$FQDN" -reqexts $extensions
+openssl ca -config config/signing-ca.conf -batch -in $fname.csr -out $fname.crt
+
+mkdir -p $fname
+mv $fname.crt $fname.key $fname
+rm $fname.csr
