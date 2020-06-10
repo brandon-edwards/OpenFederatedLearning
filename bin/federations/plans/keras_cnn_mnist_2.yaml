@@ -49,11 +49,6 @@ federation:
   latest_model_fname: keras_cnn_mnist_latest.pbuf
   best_model_fname: keras_cnn_mnist_best.pbuf
 
-hostnames:
-  __DEFAULT_HOSTNAME__: localhost
-  col_0: localhost
-  col_1: localhost
-
 model:
   code_path: models.tensorflow
   class_name: KerasCNN
@@ -64,8 +59,8 @@ aggregator:
   col_ids: *col_ids
   rounds_to_train: *rounds_to_train
   test_mode_whitelist:
-    - <test_machine_name1>
-    - <test_machine_name2>
+    - TEST_MACHINE_NAME
+    - TEST_MACHINE_NAME2
 
 collaborator:
   agg_id: *agg_id

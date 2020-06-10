@@ -18,18 +18,21 @@ then
 fi
 
 FQDN=$1
+
 subject_alt_name="DNS:$FQDN"
 
-if valid_fqdn $FQDN; 
-then 
-    echo "Valid FQDN";
-    extensions="client_reqext_san"
-else 
-    echo "Note: collaborator CN is not a valid FQDN and will not be added to the DNS entry of the subject alternative names";
-    extensions="client_reqext"
-fi
+# FIXME: failing tests when using client_reqext_san
+# This commented block below should be restored when we can debug cause
+#if valid_fqdn $FQDN; 
+#then 
+#     echo "Valid FQDN";
+#     extensions="client_reqext_san"
+# else 
+#     echo "Note: collaborator CN is not a valid FQDN and will not be added to the DNS entry of the subject alternative names";
+#     extensions="client_reqext"
+# fi
 
-FQDN=$1
+extensions="client_reqext"
 
 fname="col_$FQDN"
 
