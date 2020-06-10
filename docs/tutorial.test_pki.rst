@@ -99,15 +99,60 @@ Create the root-ca and signing cert
   Data Base Updated
   (base) ------
 
-3. Run the aggregator cert script, replacing AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME with the actual FQDN for the aggregator machine.
+3. Run the aggregator cert script, replacing AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME with the actual FQDN for the aggregator machine. You may optionally include the IP address for the aggregator, replacing [IP_ADDRESS]
 
 .. code-block:: console
 
-  $ bash create-aggregator.sh -c AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME
+  $ bash create-aggregator.sh AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME
+  Valid FQDN
+  No IP specified. IP address will not be included in subject alt name.
+  Creating debug client key pair with following settings: CN=AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME SAN=DNS:AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME
   Generating a RSA private key
-  ...............+++++
-  ................................+++++
-  writing new private key to 'AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME.key'
+  ..............+++++
+  ..................+++++
+  writing new private key to 'agg_AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME.key'
+  -----
+  Using configuration from config/signing-ca.conf
+  Check that the request matches the signature
+  Signature ok
+  Certificate Details:
+          Serial Number: 2 (0x2)
+          Validity
+              Not Before: Jun 10 22:39:03 2020 GMT
+              Not After : Jun 10 22:39:03 2021 GMT
+          Subject:
+              commonName                = AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME
+          X509v3 extensions:
+              X509v3 Basic Constraints:
+                  CA:FALSE
+              X509v3 Authority Key Identifier:
+                  keyid:9F:B0:5A:5C:17:7B:67:44:5B:E6:6C:B8:F7:9E:17:D7:54:18:13:27
+
+              X509v3 Key Usage: critical
+                  Digital Signature, Key Encipherment
+              X509v3 Extended Key Usage:
+                  TLS Web Server Authentication
+              X509v3 Subject Key Identifier:
+                  72:FD:FB:70:54:32:40:D6:5D:30:B4:7E:05:C3:F3:C6:75:4D:89:5C
+              X509v3 Subject Alternative Name:
+                  DNS:AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME
+  Certificate is to be certified until Jun 10 22:39:03 2021 GMT (365 days)
+
+  Write out database with 1 new entries
+  Data Base Updated
+  
+4. **For each test machine you want to run collaborators on**, we create a collaborator cert, replacing TEST.MACHINE.NAME with the actual test machine name. This does not have to be the FQDN:
+
+
+.. code-block:: console
+
+  $ bash create-collaborator.sh TEST.MACHINE.NAME
+  Note: collaborator CN is not a valid FQDN and will not be added to the DNS entry of the subject alternative names
+  Creating collaborator key pair with following settings: CN=TEST_MACHINE_NAME SAN=DNS:TEST_MACHINE_NAME
+  Generating a RSA private key
+  ...............................................................................................................+++++
+  ..............................+++++
+  writing new private key to 'col_TEST_MACHINE_NAME.key'
   -----
   Using configuration from config/signing-ca.conf
   Check that the request matches the signature
@@ -115,66 +160,26 @@ Create the root-ca and signing cert
   Certificate Details:
           Serial Number: 3 (0x3)
           Validity
-              Not Before: May 22 17:51:52 2020 GMT
-              Not After : May 22 17:51:52 2021 GMT
+              Not Before: Jun 10 22:40:41 2020 GMT
+              Not After : Jun 10 22:40:41 2021 GMT
           Subject:
-              commonName                = AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME
+              commonName                = TEST_MACHINE_NAME
           X509v3 extensions:
               X509v3 Basic Constraints:
                   CA:FALSE
               X509v3 Authority Key Identifier:
-                  keyid:FE:86:D8:25:97:B3:C5:A3:3D:8C:5C:2A:7D:99:84:25:19:DE:0C:A4
-
-              X509v3 Key Usage: critical
-                  Digital Signature, Key Encipherment
-              X509v3 Extended Key Usage:
-                  TLS Web Server Authentication
-              X509v3 Subject Key Identifier:
-                  43:C6:30:45:1B:51:60:74:2B:11:C1:CE:B0:DC:84:6A:50:A7:7E:FE
-              X509v3 Subject Alternative Name:
-  Certificate is to be certified until May 22 17:51:52 2021 GMT (365 days)
-
-  Write out database with 1 new entries
-  Data Base Updated
-  (base)
-  
-4. **For each test machine you want to run collaborators on**, we create a collaborator cert, replacing TEST.MACHINE.NAME with the actual test machine name. This does not have to be the FQDN:
-
-
-.. code-block:: console
-
-  $ bash create-collaborator.sh -c TEST.MACHINE.NAME
-  Generating a RSA private key
-  .................................................+++++
-  .................+++++
-  writing new private key to 'TEST.MACHINE.NAME.key'
-  -----
-  req: Skipping unknown attribute "WD"
-  Using configuration from config/signing-ca.conf
-  Check that the request matches the signature
-  Signature ok
-  Certificate Details:
-          Serial Number: 4 (0x4)
-          Validity
-              Not Before: May 22 18:00:34 2020 GMT
-              Not After : May 22 18:00:34 2021 GMT
-          Subject:
-              commonName                = TEST.MACHINE.NAME
-          X509v3 extensions:
-              X509v3 Basic Constraints:
-                  CA:FALSE
-              X509v3 Authority Key Identifier:
-                  keyid:FE:86:D8:25:97:B3:C5:A3:3D:8C:5C:2A:7D:99:84:25:19:DE:0C:A4
+                  keyid:9F:B0:5A:5C:17:7B:67:44:5B:E6:6C:B8:F7:9E:17:D7:54:18:13:27
 
               X509v3 Key Usage: critical
                   Digital Signature, Key Encipherment
               X509v3 Extended Key Usage:
                   TLS Web Client Authentication
               X509v3 Subject Key Identifier:
-                  BB:FB:75:2D:79:93:78:FC:78:03:32:DE:53:1F:99:85:C7:37:01:F3
+                  8C:81:F5:1B:5B:85:F5:24:C0:2D:E8:38:CE:D7:63:3A:BF:D3:06:3C
               X509v3 Subject Alternative Name:
-  Certificate is to be certified until May 22 18:00:34 2021 GMT (365 days)
+                  DNS:TEST_MACHINE_NAME
+  Certificate is to be certified until Jun 10 22:40:41 2021 GMT (365 days)
 
   Write out database with 1 new entries
   Data Base Updated
-  (base)
+
