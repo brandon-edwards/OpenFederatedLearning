@@ -123,8 +123,8 @@ build_containers:
 
 run_agg_container:
 
-	@echo "Aggregator Container started."
-	@echo "Run the command: ./run_mnist_aggregator.sh"
+	@echo "Aggregator container started. You are in the Docker container."
+	@echo "Run the command: python3 run_aggregator_from_flplan.py -p keras_cnn_mnist_2.yaml"
 	@docker run \
 	--net=host \
 	-it --name=tfl_agg_$(model_name)_$(shell whoami) \
@@ -137,8 +137,8 @@ run_agg_container:
 
 run_col_container:
 
-	@echo "Collaborator $(col_num) started. You are in the Docker container"
-	@echo "Run the command: ./run_mnist_collaborator.sh $(col_num)"
+	@echo "Collaborator $(col_num) container started. You are in the Docker container"
+	@echo "Run the command: python3 run_collaborator_from_flplan.py -p keras_cnn_mnist_2.yaml -col $(col_num) -dc docker_data_config.yaml"
 	@docker run \
 	$(runtime_line) \
 	--net=host \
