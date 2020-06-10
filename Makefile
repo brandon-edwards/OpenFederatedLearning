@@ -3,7 +3,7 @@
 
 # WIP for transfering tutorial steps to makefile
 
-col_num ?= 0
+col_name ?= 0
 framework_name ?= tensorflow
 model_name ?= keras_cnn
 use_gpu ?= false
@@ -25,7 +25,7 @@ endif
 
 ifeq ($(dataset),brats)
     additional_brats_container_lines = \
-	-v '<SYMLINK_DIR>/$(col_num)':/home/$(shell whoami)/tfl/datasets/brats:ro \
+	-v '<SYMLINK_DIR>/$(col_name)':/home/$(shell whoami)/tfl/datasets/brats:ro \
     -v '<BRATS_DIR>':<BRATS_DIR>:ro
 endif
 
@@ -53,7 +53,7 @@ venv/bin/python3:
 	venv/bin/pip3 install --upgrade pip
 	venv/bin/pip3 install --upgrade setuptools
 	venv/bin/pip3 install --upgrade wheel
-	
+
 $(whl): venv/bin/python3
 	venv/bin/python3 setup.py bdist_wheel
 	# we will use the wheel, and do not want the egg info
@@ -61,7 +61,7 @@ $(whl): venv/bin/python3
 
 $(tfl): $(whl)
 	venv/bin/pip3 install $(whl)
-	
+
 uninstall:
 	venv/bin/pip3 uninstall -y tfedlrn
 	rm -rf dist
@@ -133,19 +133,19 @@ run_agg_container:
 	-v $(shell pwd)/bin/federations:/home/$(shell whoami)/tfl/bin/federations:$(mount_type) \
 	$(additional_brats_container_lines) \
 	tfl_agg_$(model_name)_$(shell whoami):0.1 \
-	bash -c "echo \"export PS1='\e[0;31m[FL Docker for \e[0;32mAggregator\e[0;31m \w$]\e[m >> '\" >> ~/.bashrc && bash" 
+	bash -c "echo \"export PS1='\e[0;31m[FL Docker for \e[0;32mAggregator\e[0;31m \w$]\e[m >> '\" >> ~/.bashrc && bash"
 
 run_col_container:
 
-	@echo "Collaborator $(col_num) container started. You are in the Docker container"
-	@echo "Run the command: python3 run_collaborator_from_flplan.py -p keras_cnn_mnist_2.yaml -col col_$(col_num) -dc docker_data_config.yaml"
+	@echo "Collaborator $(col_name) container started. You are in the Docker container"
+	@echo "Run the command: python3 run_collaborator_from_flplan.py -p keras_cnn_mnist_2.yaml -col $(col_name) -dc docker_data_config.yaml"
 	@docker run \
 	$(runtime_line) \
 	--net=host \
-	-it --name=tfl_col_$(device)_$(model_name)_$(shell whoami)_$(col_num) \
+	-it --name=tfl_col_$(device)_$(model_name)_$(shell whoami)_$(col_name) \
 	--rm \
 	-v $(shell pwd)/bin/federations:/home/$(shell whoami)/tfl/bin/federations:$(mount_type) \
 	$(additional_brats_container_lines) \
 	-w /home/$(shell whoami)/tfl/bin \
 	tfl_col_$(device)_$(model_name)_$(shell whoami):0.1 \
-	bash -c "echo \"export PS1='\e[0;31m[FL Docker for \e[0;32mCollaborator $(col_num)\e[0;31m \w$]\e[m >> '\" >> ~/.bashrc && bash"
+	bash -c "echo \"export PS1='\e[0;31m[FL Docker for \e[0;32mCollaborator $(col_name)\e[0;31m \w$]\e[m >> '\" >> ~/.bashrc && bash"
