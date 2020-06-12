@@ -193,7 +193,7 @@ class PyTorch2DUNet(PyTorchFLModel):
         elif optimizer == 'RMSprop':
             self.optimizer = optim.RMSprop(self.parameters(), lr=1e-5, momentum=0.9)
         elif optimizer == 'Adam':
-            self.optimizer = optim.Adam(self.parameters(), lr=1e-5)
+            self.optimizer = optim.Adam(self.parameters(), lr=4e-5)
         else:
             raise ValueError('Optimizer: {} is not curently supported'.format(optimizer))
 
