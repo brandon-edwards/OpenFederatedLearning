@@ -31,7 +31,7 @@
 
 # We may have several plans for one dataset, to search the best model architecture for exammple.
 
-description     : Train a model to perform semantic segmentation on brain fMRI images.
+description     : Train a simple Keras model to classify MNIST using 10 collaborators.
 status          : active
 
 federation:
