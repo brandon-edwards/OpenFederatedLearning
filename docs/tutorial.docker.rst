@@ -20,6 +20,7 @@ installed and confugured properly. Here is a easy test to run in order to test s
   ...
   ...
 
+Additionally, we need to set up the PKI for our test machines. See docs/tutorial.test_pki.rst for how to set up a PKI among trusted test machines. **Note that PKI tutorial is not for production deployments, as explained in that tutorial**
 
 Federated Training of an MNIST Classifier
 -------------------------------------------
@@ -64,56 +65,23 @@ Find the keys in the federation config for the address ("agg_addr") and port ("a
 ...
 
 
-Next find the hostnames key and set the machine names for each collaborator.
-You may use the same machine as the aggregator. Any collaborator not explicitly set
-will use the "__DEFAULT_HOSTNAME__".
+Next find the "aggregator" section and the subkey "test_mode_whitelist" and enter the common names used for the certificates  for each collaborator machine you created in the test_pki step. Note that you must only whitelist test machines that you trust, as such machines are able to act as any collaborator id. This is why we call this "test_mode", as this is not proper security in a production setting.
 
 .. code-block:: console
 
   ...
-  hostnames:
-    __DEFAULT_HOSTNAME__: defaultcol.doman.com  # CHANGE THIS
-    col_0: col0.doman.com                       # CHANGE THIS
-    col_1: col1.doman.com                       # CHANGE THIS
+
+  aggregator:
+    agg_id: *agg_id
+    fed_id: *fed_id
+    col_ids: *col_ids
+    rounds_to_train: *rounds_to_train
+    test_mode_whitelist:
+      - TEST_MACHINE_NAME   # CHANGE TO THE COMMON NAME USED IN THE COLLABORATOR CERT FOR THIS MACHINE
+      - TEST_MACHINE_NAME2  # CHANGE TO THE COMMON NAME USED IN THE COLLABORATOR CERT FOR THIS MACHINE
   ...
 
-
-3. Build the pki using our plan file. For some pki details, see :ref:`tutorial-tls` (requires pyyaml be installed). 
-
-
-.. code-block:: console
-
-  $ bin/create_pki_for_flplan.py -p keras_cnn_mnist_2.yaml
-
-
-  Generating RSA private key, 3072 bit long modulus (2 primes)
-  created /home/msheller/git/tfl_upenn/bin/federations/certs/test/ca.key
-  created /home/msheller/git/tfl_upenn/bin/federations/certs/test/ca.crt
-  Generating RSA private key, 3072 bit long modulus (2 primes)
-  created /home/msheller/git/tfl_upenn/bin/federations/certs/test/agg_0.key
-  ...
-
-
-4. Copy files to each machine as needed:
-
-.. list-table:: Files to copy
-   :widths: 25 25
-   :header-rows: 1
-
-   * - Filename
-     - Needed By
-   * - ca.crt
-     - All
-   * - keras_cnn_mnist_2.yaml
-     - All
-   * - docker_data_config.yaml
-     - all collaborators
-   * - agg_0.key
-     - aggregator machine
-   * - col_*.key
-     - collaborator machine for col_*
-   * - col_*.crt
-     - collaborator machine for col_*
+4. Copy the modified FL plan to each test machine. When done, each machine should have the same file at bin/federations/plans/keras_cnn_mnist_2.yaml
 
 Start an Aggregator
 ^^^^^^^^^^^^^^^^^^^^
@@ -154,11 +122,7 @@ the needed packages.
     Sending build context to Docker daemon   3.25GB
     Step 1/29 : ARG BASE_IMAGE=ubuntu:18.04
     Step 2/29 : FROM $BASE_IMAGE
-     ---> ccc6e87d482b
-    Step 3/29 : LABEL maintainer "Weilin Xu <weilin.xu@intel.com>"
-     ---> Using cache
-     ---> 7850bfc2c817
-    
+     ---> ccc6e87d482b    
        ...
        ...
        ...
@@ -186,7 +150,6 @@ the needed packages.
     Step 7/7 : RUN pip3 install intel-tensorflow==1.14.0;
      ---> Using cache
      ---> 7d1b3ef6fb8c
-    [Warning] One or more build-args [use_gpu] were not consumed
     Successfully built 7d1b3ef6fb8c
     Successfully tagged tfl_col_cpu_keras_cnn_edwardsb:0.1
 
@@ -196,14 +159,11 @@ again using the Makefile. Note that we map the local volumes `./bin/federations`
 .. code-block:: console
 
   $ make run_agg_container model_name=keras_cnn
-    docker run \
-    --net=host \
-    -it --name=tfl_agg_keras_cnn_edwardsb \
-    --rm \
-    -w /home/edwardsb/tfl/bin \
-    -v /home/edwardsb/repositories/gitlab_tfedlearn/bin/federations:/home/edwardsb/tfl/bin/federations:rw \
-    tfl_agg_keras_cnn_edwardsb:0.1 \
-    bash 
+  Aggregator container started. You are in the Docker container.
+  Make sure you've defined the initial weights protobuf file before starting the aggregator.
+  Run the command: python3 run_aggregator_from_flplan.py -p PLAN_NAME.yaml -ccn AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME
+  [FL Docker for Aggregator ~/tfl/bin >>
+
 
 3. In the aggregator container shell, build the initial weights files providing the global model initialization 
 that will be sent from the aggregator out to all collaborators.
@@ -216,14 +176,13 @@ that will be sent from the aggregator out to all collaborators.
   ...
   ...
 
-created /home/edwardsb/tfl/bin/federations/weights/keras_cnn_mnist_init.pbuf
+  created /home/msheller/tfl/bin/federations/weights/keras_cnn_mnist_init.pbuf
 
-4. In the aggregator container shell, run the aggregator, using
-a shell script provided in the project.
+4. In the aggregator container shell, run the aggregator, using the following python command, replacing the aggregator FQDN for AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME:
 
 .. code-block:: console
 
-  $ ./run_mnist_aggregator.sh 
+  $ python3 run_aggregator_from_flplan.py -p keras_cnn_mnist_2.yaml -ccn AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME
   Loaded logging configuration: logging.yaml
   2020-01-15 23:17:18,143 - tfedlrn.aggregator.aggregatorgrpcserver - DEBUG - Starting aggregator.
 
@@ -244,21 +203,21 @@ Note: the collaborator machines can be the same as the aggregator machine.
 Run the first collaborator container (entering a bash shell inside the container) 
 using the project folder Makefile. Note that we map the local volumes `./bin/federations` 
 to the docker container, and that we set different names for the two 
-collaborator containers (hence the argument 'col_num'), though they share the same 
+collaborator containers (hence the argument 'col_name'), though they share the same 
 docker image.
 
 .. code-block:: console
 
-  $ make run_col_container model_name=keras_cnn col_num=0
-  docker run \
-  ...
-  bash 
+  $ make run_col_container model_name=keras_cnn col_name=col_0
+  Collaborator col_0 container started. You are in the Docker container
+  Run the command: python3 run_collaborator_from_flplan.py -p PLAN_NAME.yaml -ccn TEST_MACHINE_COMMON_NAME -col col_0 -dc docker_data_config.yaml
+  [FL Docker for Collaborator col_0 ~/tfl/bin >>
 
-5. In this first collaborator shell, run the collabotor using the provided shell script.
+5. In this first collaborator shell, run the collabotor using the following command, replacing TEST_MACHINE_COMMON_NAME with the common name used in the cert for this machine:
 
 .. code-block:: console
 
-  $ ./run_mnist_collaborator.sh 0 
+  $ python3 run_collaborator_from_flplan.py -p keras_cnn_mnist_2.yaml -ccn TEST_MACHINE_COMMON_NAME -col col_0 -dc docker_data_config.yaml
   
 
 6. (**On the second collaborator machine, which could be a second terminal on the first machine**)
@@ -266,17 +225,31 @@ Run the second collaborator container (entering a bash shell inside the containe
 
 .. code-block:: console
 
-  $ make run_col_container model_name=keras_cnn col_num=1
-  docker run \
-  ...
-  bash
+  $ make run_col_container model_name=keras_cnn col_name=col_1
+  Collaborator col_1 container started. You are in the Docker container
+  Run the command: python3 run_collaborator_from_flplan.py -p PLAN_NAME.yaml -ccn TEST_MACHINE_COMMON_NAME -col col_1 -dc docker_data_config.yaml
+  [FL Docker for Collaborator col_1 ~/tfl/bin >>
 
-
-7. In the second collaborator container shell, run the second collaborator.
+7. In the second collaborator container shell, run the second collaborator, again setting the common name in the cert for this collaborator:
 
 .. code-block:: console
 
-  $ ./run_mnist_collaborator.sh 1 
+  $ python3 run_collaborator_from_flplan.py -p keras_cnn_mnist_2.yaml -ccn TEST_MACHINE_COMMON_NAME -col col_1 -dc docker_data_config.yaml
+  
+The federation will train for 16 rounds. When it completes, in the aggregator console, you should see the following:
+
+.. code-block:: console
+  2020-06-15 18:04:42,716 - tfedlrn.aggregator.aggregator - INFO - round results for model id/version KerasCNN/15
+  2020-06-15 18:04:42,717 - tfedlrn.aggregator.aggregator - INFO -        validation: 0.9570000171661377
+  2020-06-15 18:04:42,717 - tfedlrn.aggregator.aggregator - INFO -        loss: 0.08092422783374786
+  2020-06-15 18:04:42,718 - tfedlrn.aggregator.aggregator - DEBUG - Start a new round 17.
+  2020-06-15 18:04:42,719 - tfedlrn.aggregator.aggregator - DEBUG - aggregator handled UploadLocalMetricsUpdate in time 0.0031032562255859375
+  2020-06-15 18:04:42,719 - tfedlrn.aggregator.aggregator - DEBUG - aggregator handled UploadLocalMetricsUpdate in time 0.0032558441162109375
+  2020-06-15 18:04:42,720 - tfedlrn.aggregator.aggregator - DEBUG - Receive job request from col_0 and assign with 3
+  2020-06-15 18:04:42,721 - tfedlrn.aggregator.aggregator - DEBUG - aggregator handled RequestJob in time 0.0003361701965332031
+  2020-06-15 18:04:45,465 - tfedlrn.aggregator.aggregator - DEBUG - Receive job request from col_1 and assign with 3
+  2020-06-15 18:04:45,465 - tfedlrn.aggregator.aggregator - DEBUG - aggregator handled RequestJob in time 0.0003685951232910156
+  [FL Docker for Aggregator ~/tfl/bin >>
 
 
 Federated Training of the 2D UNet (Brain Tumor Segmentation)
@@ -334,77 +307,43 @@ Find the keys in the federation config for the address ("agg_addr") and port ("a
 ...
 
 
-Next find the hostnames key and set the machine names for each collaborator.
-You may use the same machine as the aggregator. Any collaborator not explicitly set
-will use the "__DEFAULT_HOSTNAME__".
+Next find the "aggregator" section and the subkey "test_mode_whitelist" and enter the common names used for the certificates  for each collaborator machine you created in the test_pki step. Note that you must only whitelist test machines that you trust, as such machines are able to act as any collaborator id. This is why we call this "test_mode", as this is not proper security in a production setting.
 
 .. code-block:: console
 
   ...
-  hostnames:
-    __DEFAULT_HOSTNAME__: defaultcol.doman.com  # CHANGE THIS
-    col_0: col0.doman.com                       # CHANGE THIS
-    col_1: col1.doman.com                       # CHANGE THIS
+
+  aggregator:
+    agg_id: *agg_id
+    fed_id: *fed_id
+    col_ids: *col_ids
+    rounds_to_train: *rounds_to_train
+    test_mode_whitelist:
+      - TEST_MACHINE_NAME   # CHANGE TO THE COMMON NAME USED IN THE COLLABORATOR CERT FOR THIS MACHINE
+      - TEST_MACHINE_NAME2  # CHANGE TO THE COMMON NAME USED IN THE COLLABORATOR CERT FOR THIS MACHINE
   ...
 
 
-3. Build the pki using our plan file. For some pki details, see :ref:`tutorial-tls`. 
-
-
-.. code-block:: console
-
-  $ bin/create_pki_for_flplan.py -p tf_2dunet_brats_insts2_3.yaml
-
-
-  Generating RSA private key, 3072 bit long modulus (2 primes)
-  created /home/msheller/git/tfl_upenn/bin/federations/certs/test/ca.key
-  created /home/msheller/git/tfl_upenn/bin/federations/certs/test/ca.crt
-  Generating RSA private key, 3072 bit long modulus (2 primes)
-  created /home/msheller/git/tfl_upenn/bin/federations/certs/test/agg_0.key
-  ...
-
-
-4. Edit the docker data config file to refer to the correct username (the name of the account
+3. Edit the docker data config file to refer to the correct username (the name of the account
 you are using. Open bin/federations/docker_data_config.yaml and replace the username with your username
 
 .. code-block:: console
 
   $ vi bin/federations/docker_data_config.yaml
 
+  collaborators:
+    col_one_big:
+      brats: &brats_data_path '/home/<USERNAME>/tfl/datasets/brats'                # replace with your username
+    col_0:
+      brats: *brats_data_path   
+      mnist_shard: 0
+    col_1:
+      brats: *brats_data_path
+      mnist_shard: 1
+  ...
 
 
-collaborators:
-  col_one_big:
-    brats: &brats_data_path '/home/<USERNAME>/tfl/datasets/brats'                # replace with your username
-  col_0:
-    brats: *brats_data_path   
-    mnist_shard: 0
-  col_1:
-    brats: *brats_data_path
-    mnist_shard: 1
-...
-
-
-5. Copy files to each machine as needed:
-
-.. list-table:: Files to copy
-   :widths: 25 25
-   :header-rows: 1
-
-   * - Filename
-     - Needed By
-   * - ca.crt
-     - All
-   * - tf_2dunet_brats_insts2_3.yaml
-     - All
-   * - docker_data_config.yaml
-     - all collaborators
-   * - agg_0.key
-     - aggregator machine
-   * - col_*.key
-     - collaborator machine for col_*
-   * - col_*.crt
-     - collaborator machine for col_*
+5. Copy the fl plan bin/federations/plans/tf_2dunet_brats_insts2_3.yaml to each machine.
 
 Start an Aggregator
 ^^^^^^^^^^^^^^^^^^^^
@@ -447,12 +386,11 @@ that will be sent from the aggregator out to all collaborators.
 
 
 
-4. In the aggregator container shell, run the aggregator, using
-a shell script provided in the project.
+4. In the aggregator container shell, run the aggregator, using the following python command, replacing the aggregator FQDN for AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME:
 
 .. code-block:: console
 
-  $ ./run_brats_aggregator.sh 
+  $ python3 run_aggregator_from_flplan.py -p tf_2dunet_brats_insts2_3.yaml -ccn AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME
   Loaded logging configuration: logging.yaml
   2020-01-15 23:17:18,143 - tfedlrn.aggregator.aggregatorgrpcserver - DEBUG - Starting aggregator.
 
@@ -474,33 +412,25 @@ Run the first collaborator container. Note we are using collaborators 2 and 3.
 
 .. code-block:: console
 
-  $ make run_col_container model_name=tf_2dunet dataset=brats col_num=2
+  $ make run_col_container model_name=tf_2dunet dataset=brats col_name=col_2
 
-5. In this first collaborator shell, run the collabotor using the provided shell script.
+5. In this first collaborator shell, run the collabotor using the following command, replacing TEST_MACHINE_COMMON_NAME with the common name used in the cert for this machine:
 
 .. code-block:: console
 
-  $ ./run_brats_collaborator.sh 2 
+  $ python3 run_collaborator_from_flplan.py -p tf_2dunet_brats_insts2_3.yaml -ccn TEST_MACHINE_COMMON_NAME -col col_2 -dc docker_data_config.yaml
 
 6. (**On the second collaborator machine, which could be a second terminal on the first machine**)
 Run the second collaborator container (entering a bash shell inside the container).
 
 .. code-block:: console
 
-  $ make run_col_container model_name=tf_2dunet dataset=brats col_num=3
-  docker run \
-  ...
-  bash
+  $ make run_col_container model_name=tf_2dunet dataset=brats col_name=col_3
 
-
-7. In the second collaborator container shell, run the second collaborator.
+5. In this first collaborator shell, run the collabotor using the following command, replacing TEST_MACHINE_COMMON_NAME with the common name used in the cert for this machine:
 
 .. code-block:: console
 
-  $ ./run_brats_collaborator.sh 3
-
-  ...
-  ...
-  ...
+  $ python3 run_collaborator_from_flplan.py -p tf_2dunet_brats_insts2_3.yaml -ccn TEST_MACHINE_COMMON_NAME -col col_3 -dc docker_data_config.yaml
 
 
