@@ -40,9 +40,6 @@ class PyTorch2DUNet(PyTorchFLModel):
         self.loss_fn = partial(dice_coef_loss, smoothing=1.0)
    
     def train_epoch(self, epoch=None, use_tqdm=False):
-        # FIXME: update to proper training schedule when architected
-        if epoch == 8:
-            self.init_optimizer('RMSprop')
 
         # set to "training" mode
         self.train()
