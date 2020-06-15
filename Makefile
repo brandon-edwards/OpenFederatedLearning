@@ -139,7 +139,7 @@ run_agg_container:
 run_col_container:
 
 	@echo "Collaborator $(col_name) container started. You are in the Docker container"
-	@echo "Run the command: python3 run_collaborator_from_flplan.py -p PLAN_NAME.yaml -ccn AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME -col $(col_name) -dc docker_data_config.yaml"
+	@echo "Run the command: python3 run_collaborator_from_flplan.py -p PLAN_NAME.yaml -ccn TEST_MACHINE_COMMON_NAME -col $(col_name) -dc docker_data_config.yaml"
 	@docker run \
 	$(runtime_line) \
 	--net=host \
