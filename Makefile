@@ -124,7 +124,8 @@ build_containers:
 run_agg_container:
 
 	@echo "Aggregator container started. You are in the Docker container."
-	@echo "Run the command: python3 run_aggregator_from_flplan.py -p keras_cnn_mnist_2.yaml"
+	@echo "Make sure you've defined the initial weights protobuf file before starting the aggregator."
+	@echo "Run the command: python3 run_aggregator_from_flplan.py -p PLAN_NAME.yaml -ccn AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME"
 	@docker run \
 	--net=host \
 	-it --name=tfl_agg_$(model_name)_$(shell whoami) \
@@ -138,7 +139,7 @@ run_agg_container:
 run_col_container:
 
 	@echo "Collaborator $(col_name) container started. You are in the Docker container"
-	@echo "Run the command: python3 run_collaborator_from_flplan.py -p keras_cnn_mnist_2.yaml -col $(col_name) -dc docker_data_config.yaml"
+	@echo "Run the command: python3 run_collaborator_from_flplan.py -p PLAN_NAME.yaml -ccn AGGREGATOR.FULLY.QUALIFIED.DOMAIN.NAME -col $(col_name) -dc docker_data_config.yaml"
 	@docker run \
 	$(runtime_line) \
 	--net=host \

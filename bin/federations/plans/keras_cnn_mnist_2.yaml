@@ -31,7 +31,7 @@
 
 # We may have several plans for one dataset, to search the best model architecture for exammple.
 
-description     : Train a model to perform semantic segmentation on brain fMRI images.
+description     : Train a simple Keras model to classify MNIST using 2 collaborators.
 status          : active
 
 federation:
@@ -49,11 +49,6 @@ federation:
   latest_model_fname: keras_cnn_mnist_latest.pbuf
   best_model_fname: keras_cnn_mnist_best.pbuf
 
-hostnames:
-  __DEFAULT_HOSTNAME__: localhost
-  col_0: localhost
-  col_1: localhost
-
 model:
   code_path: models.tensorflow
   class_name: KerasCNN
@@ -63,6 +58,9 @@ aggregator:
   fed_id: *fed_id
   col_ids: *col_ids
   rounds_to_train: *rounds_to_train
+  test_mode_whitelist:
+    - TEST_MACHINE_NAME
+    - TEST_MACHINE_NAME2
 
 collaborator:
   agg_id: *agg_id
@@ -75,7 +73,7 @@ grpc:
   port: *agg_port
   disable_tls: False
   disable_client_auth: False
-  cert_folder: test
+  cert_folder: pki
 
 data:
   data_name: mnist_shard 
