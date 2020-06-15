@@ -58,7 +58,7 @@ and cd to the bin directory.
 
 .. code-block:: console
 
-  $ pwd                                                                                                                                                                                                                            msheller@spr-gpu01
+  $ pwd
     /home/<user>/git/tfedlrn/bin
   $ grep -A 2 "round results" logs/aggregator.log
     2020-03-30 13:45:33,404 - tfedlrn.aggregator.aggregator - INFO - round results for model id/version KerasCNN/1
