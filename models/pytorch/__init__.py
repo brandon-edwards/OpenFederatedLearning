@@ -3,5 +3,3 @@
 
 
 from .pytorchflmodel import PyTorchFLModel
-from .representation_matching import RepresentationMatchingWrapper
-
