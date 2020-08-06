@@ -18,29 +18,27 @@ then
 fi
 
 FQDN=$1
-
 subject_alt_name="DNS:$FQDN"
 
-# FIXME: failing tests when using client_reqext_san
-# This commented block below should be restored when we can debug cause
-#if valid_fqdn $FQDN; 
-#then 
-#     echo "Valid FQDN";
-#     extensions="client_reqext_san"
-# else 
-#     echo "Note: collaborator CN is not a valid FQDN and will not be added to the DNS entry of the subject alternative names";
-#     extensions="client_reqext"
-# fi
+if valid_fqdn $FQDN; 
+then 
+    echo "Valid FQDN";
+    extensions="client_reqext_san"
+else 
+    echo "Note: collaborator CN is not a valid FQDN and will not be added to the DNS entry of the subject alternative names";
+    extensions="client_reqext"
+fi
 
-extensions="client_reqext"
+FQDN=$1
 
-fname="col_$FQDN"
+fname="$FQDN"
 
 echo "Creating collaborator key pair with following settings: CN=$FQDN SAN=$subject_alt_name"
 
 SAN=$subject_alt_name openssl req -new -config config/client.conf -out $fname.csr -keyout $fname.key -subj "/CN=$FQDN" -reqexts $extensions
-openssl ca -config config/signing-ca.conf -batch -in $fname.csr -out $fname.crt
 
-mkdir -p $fname
-mv $fname.crt $fname.key $fname
-rm $fname.csr
+mkdir -p client
+mv $fname.csr $fname.key client
+
+echo "Send the following 6 hex values to the signing party to confirm your CSR:"
+openssl sha256 client/$fname.csr | sed 's/.*\(......\)/\1/'

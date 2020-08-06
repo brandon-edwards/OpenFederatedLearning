@@ -45,7 +45,6 @@ else
     exit 1;
 fi
 
-
 FQDN=$1
 subject_alt_name="DNS:$FQDN"
 
@@ -65,11 +64,12 @@ fi
 
 echo "Creating debug client key pair with following settings: CN=$FQDN SAN=$subject_alt_name"
 
-fname="agg_$FQDN"
+fname="$FQDN"
 
 SAN=$subject_alt_name openssl req -new -config config/server.conf -subj "/CN=$FQDN" -out $fname.csr -keyout $fname.key
-openssl ca -config config/signing-ca.conf -batch -extensions server_ext -in $fname.csr -out $fname.crt
 
-mkdir -p $fname
-mv $fname.crt $fname.key $fname
-rm $fname.csr
+mkdir -p server
+mv $fname.csr $fname.key server
+
+echo "Send the following 6 hex values to the signing party to confirm your CSR:"
+openssl sha256 server/$fname.csr | sed 's/.*\(......\)/\1/'

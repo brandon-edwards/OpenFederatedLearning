@@ -3,6 +3,7 @@
 
 from .utils import load_yaml, get_object, split_tensor_dict_for_holdouts
 
+
 def check_type(obj, expected_type, logger):
     if not isinstance(obj, expected_type):
         exception = TypeError("Expected type {}, got type {}".format(type(obj), str(expected_type)))

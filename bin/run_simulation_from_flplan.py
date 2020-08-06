@@ -6,67 +6,64 @@
 import argparse
 import os
 import logging
-import importlib
 
-from tfedlrn import load_yaml, get_object
-from single_proc_fed import federate
-from setup_logging import setup_logging
+from tfedlrn            import load_yaml
+from tfedlrn.flplan     import parse_fl_plan
+from single_proc_fed    import federate
+from setup_logging      import setup_logging
 
-def get_data(data_names_to_paths, data_name, code_path, class_name, **kwargs):
-    data_path = data_names_to_paths[data_name]
-    return get_object(code_path, class_name, data_path=data_path, **kwargs)
 
-def main(plan, data_config_fname, logging_config_fname, logging_default_level, **kwargs):
+def main(plan, collaborators_file, data_config_fname, logging_config_path, logging_default_level, logging_directory, **kwargs):
+    """Run the federation simulation from the federation (FL) plan.
 
-    setup_logging(path=logging_config_fname, default_level=logging_default_level)
+    Runs a federated training from the federation (FL) plan but creates the
+    aggregator and collaborators on the same compute node. This allows
+    the developer to test the model and data loaders before running
+    on the remote collaborator nodes.
 
+    Args:
+        plan: The Federation (FL) plan (YAML file)
+        collaborators_file: The file listing the collaborators
+        data_config_fname: The file describing where the dataset is located on the collaborators
+        logging_config_path: The log file
+        logging_default_level: The log level
+        **kwargs: Variable parameters to pass to the function
+
+    """
     # FIXME: consistent filesystem (#15)
-    # establish location for fl plan as well as 
+    # establish location for fl plan as well as
     # where to get and write model protobufs
     script_dir = os.path.dirname(os.path.realpath(__file__))
     base_dir = os.path.join(script_dir, 'federations')
     plan_dir = os.path.join(base_dir, 'plans')
     weights_dir = os.path.join(base_dir, 'weights')
+    collaborators_dir = os.path.join(base_dir, 'collaborator_lists')
+    logging_config_path = os.path.join(script_dir, logging_config_path)
+    logging_directory = os.path.join(script_dir, logging_directory)
 
-    # parse configs from flplan
-    flplan = load_yaml(os.path.join(plan_dir, plan))
-    by_col_data_names_to_paths = load_yaml(os.path.join(base_dir, data_config_fname))['collaborators']
-    fed_config = flplan['federation']
-    agg_config = flplan['aggregator']
-    col_config = flplan['collaborator']
-    model_config = flplan['model']
-    data_config = flplan['data']
+    setup_logging(path=logging_config_path, default_level=logging_default_level, logging_directory=logging_directory)
 
-
-    init_model_fpath = os.path.join(weights_dir, fed_config['init_model_fname'])
-    latest_model_fpath = os.path.join(weights_dir, fed_config['latest_model_fname'])
-    best_model_fpath = os.path.join(weights_dir, fed_config['best_model_fname'])
-
-    
-
-
-    # get the BraTS data objects for each collaborator
-    col_ids = fed_config['col_ids']
-    col_data = {col_id: get_data(by_col_data_names_to_paths[col_id], **data_config) for col_id in col_ids}
-    
+    # load the flplan, local_config and collaborators file
+    flplan = parse_fl_plan(os.path.join(plan_dir, plan))
+    local_config = load_yaml(os.path.join(base_dir, data_config_fname))
+    collaborator_common_names = load_yaml(os.path.join(collaborators_dir, collaborators_file))['collaborator_common_names']
+  
     # TODO: Run a loop here over various parameter values and iterations
     # TODO: implement more than just saving init, best, and latest model
-    federate(col_config=col_config, 
-             agg_config=agg_config,
-             col_data=col_data, 
-             model_config=model_config, 
-             fed_config=fed_config, 
-             init_model_fpath = init_model_fpath, 
-             latest_model_fpath = latest_model_fpath, 
-             best_model_fpath = best_model_fpath, 
-             **kwargs)
+    federate(flplan,
+             local_config,
+             collaborator_common_names,
+             base_dir,
+             weights_dir)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--plan', '-p', type=str, required=True)
+    parser.add_argument('--collaborators_file', '-c', type=str, required=True, help="Name of YAML File in /bin/federations/collaborator_lists/")
     parser.add_argument('--data_config_fname', '-dc', type=str, default="local_data_config.yaml")
-    parser.add_argument('--logging_config_fname', '-c', type=str, default="logging.yaml")
+    parser.add_argument('--logging_config_path', '-lcp', type=str, default="logging.yaml")
     parser.add_argument('--logging_default_level', '-l', type=str, default="info")
+    parser.add_argument('--logging_directory', '-ld', type=str, default="logs")
     args = parser.parse_args()
     main(**vars(args))

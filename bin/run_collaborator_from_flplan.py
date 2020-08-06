@@ -4,72 +4,54 @@
 # Licensed subject to the terms of the separately executed evaluation license agreement between Intel Corporation and you.
 
 import argparse
+import sys
 import os
 import logging
 import importlib
 
 from tfedlrn.collaborator.collaborator import Collaborator
-from tfedlrn.collaborator.collaboratorgpcclient import CollaboratorGRPCClient
-from tfedlrn import load_yaml, get_object
-
+from tfedlrn.flplan import create_collaborator_object_from_flplan, parse_fl_plan, load_yaml
 from setup_logging import setup_logging
 
 
-def get_data(data_names_to_paths, data_name, code_path, class_name, **kwargs):
-    data_path = data_names_to_paths[data_name]
-    return get_object(code_path, class_name, data_path=data_path, **kwargs)
+def main(plan, collaborator_common_name, single_col_cert_common_name, data_config_fname, logging_config_path, logging_default_level, logging_directory):
+    """Runs the collaborator client process from the federation (FL) plan
 
-def get_channel(base_dir, cert_common_name, **col_grpc_client_config):
-    cert_dir = os.path.join(base_dir, col_grpc_client_config.pop('cert_folder', 'pki')) # default to 'pki
+    Args:
+        plan: The filename for the federation (FL) plan YAML file
+        collaborator_common_name: The common name for the collaborator node
+        single_col_cert_common_name: The SSL certificate for this collaborator
+        data_config_fname: The dataset configuration filename (YAML)
+        logging_config_fname: The log file
+        logging_default_level: The log level
 
-    return CollaboratorGRPCClient(ca=os.path.join(cert_dir, 'cert_chain.crt'),
-                                  certificate=os.path.join(cert_dir, 'col_{}'.format(cert_common_name), 'col_{}.crt'.format(cert_common_name)),
-                                  private_key=os.path.join(cert_dir, 'col_{}'.format(cert_common_name), 'col_{}.key'.format(cert_common_name)), 
-                                  **col_grpc_client_config)
-
-def main(plan, col_id, cert_common_name, data_config_fname, logging_config_fname, logging_default_level):
-    setup_logging(path=logging_config_fname, default_level=logging_default_level)
-
+    """
     # FIXME: consistent filesystem (#15)
     script_dir = os.path.dirname(os.path.realpath(__file__))
     base_dir = os.path.join(script_dir, 'federations')
     plan_dir = os.path.join(base_dir, 'plans')
+    logging_config_path = os.path.join(script_dir, logging_config_path)
+    logging_directory = os.path.join(script_dir, logging_directory)
 
-    flplan = load_yaml(os.path.join(plan_dir, plan))
-    col_config = flplan['collaborator']
-    model_config = flplan['model']
-    data_config = flplan['data']
-    data_names_to_paths = load_yaml(os.path.join(base_dir, data_config_fname))['collaborators'][col_id]
+    setup_logging(path=logging_config_path, default_level=logging_default_level, logging_directory=logging_directory)
 
-    col_grpc_client_config = flplan['grpc']
-    
-    if cert_common_name is None:
-        cert_common_name = col_id
+    flplan = parse_fl_plan(os.path.join(plan_dir, plan))
 
-    channel = get_channel(base_dir=base_dir, 
-                          cert_common_name=cert_common_name,
-                          **col_grpc_client_config)
+    local_config = load_yaml(os.path.join(base_dir, data_config_fname))
 
-    data = get_data(data_names_to_paths, **data_config)
-
-    wrapped_model = get_object(data=data, **model_config)
-
-
-    collaborator = Collaborator(col_id=col_id,
-                                wrapped_model=wrapped_model, 
-                                channel=channel, 
-                                **col_config)
-
+    collaborator = create_collaborator_object_from_flplan(flplan, collaborator_common_name, local_config, base_dir, single_col_cert_common_name)
 
     collaborator.run()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--plan', '-p', type=str, required=True)
-    parser.add_argument('--col_id', '-col', type=str, required=True)
-    parser.add_argument('--cert_common_name', '-ccn', type=str, default=None)
+    parser.add_argument('--collaborator_common_name', '-col', type=str, required=True)
+    parser.add_argument('--single_col_cert_common_name', '-scn', type=str, default=None)
     parser.add_argument('--data_config_fname', '-dc', type=str, default="local_data_config.yaml")
-    parser.add_argument('--logging_config_fname', '-lc', type=str, default="logging.yaml")
+    parser.add_argument('--logging_config_path', '-lcp', type=str, default="logging.yaml")
     parser.add_argument('--logging_default_level', '-l', type=str, default="info")
+    parser.add_argument('--logging_directory', '-ld', type=str, default="logs")
     args = parser.parse_args()
     main(**vars(args))

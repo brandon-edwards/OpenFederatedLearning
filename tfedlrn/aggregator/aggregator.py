@@ -4,6 +4,7 @@
 import time
 import os
 import logging
+import time
 
 import numpy as np
 from threading import Lock
@@ -17,56 +18,61 @@ from ..proto.collaborator_aggregator_interface_pb2 import ModelDownloadRequest, 
 from ..proto.collaborator_aggregator_interface_pb2 import LocalModelUpdate, LocalValidationResults, LocalModelUpdateAck, LocalValidationResultsAck
 
 
-from tfedlrn.proto.protoutils import load_proto, dump_proto
+from tfedlrn.proto.protoutils import dump_proto, load_proto, construct_proto, deconstruct_proto
+from tfedlrn.tensor_transformation_pipelines import NoCompressionPipeline
 
 # FIXME: simpler "stats" collection/handling
 # FIXME: remove the round tracking/job-result tracking stuff from this?
 # Feels like it conflates model aggregation with round management
 # FIXME: persistence of the trained weights.
 class Aggregator(object):
-    """An Aggregator is the centra node in federated learning.
-    
-    Parameters
-    ----------
-    id : str
-        Aggregation ID.
-    fed_id : str
-        Federation ID.
-    col_ids : list of str
-        The list of IDs of enrolled collaborators.
-    connection : ?
-        Used to be ZMQ connection, but deprecated in gRPC.
-    init_model_fpath : str
-        The location of the initial weight file.
-    latest_model_fpath : str
-        The file location to store the latest weight.
-    best_model_fpath : str
-        The file location to store the weight of the best model.
+    """An Aggregator is the central node in federated learning.
+
+    Args:
+        id (string): Aggregation ID.
+        federation_uuid (string): Federation ID
+        collaborator_common_names (list of str): The list of IDs of enrolled collaborators.
+        connection : Used to be ZMQ connection, but deprecated in gRPC.
+        init_model_fpath (string): The location of the initial weight file.
+        latest_model_fpath (string): The file location to store the latest weight.
+        best_model_fpath (string): The file location to store the weight of the best model.
     """
     # FIXME: no selector logic is in place
     def __init__(self,
-                 agg_id,
-                 fed_id,
-                 col_ids,
+                 aggregator_uuid,
+                 federation_uuid,
+                 collaborator_common_names,
                  init_model_fpath,
                  latest_model_fpath,
                  best_model_fpath,
                  rounds_to_train=256,
+                 minimum_reporting=-1,
+                 straggler_cutoff_time=np.inf,
                  disable_equality_check=True,
-                 test_mode_whitelist=None,
+                 single_col_cert_common_name=None,
+                 compression_pipeline=None,
                  **kwargs):
         self.logger = logging.getLogger(__name__)
-        self.id = agg_id
-        self.fed_id = fed_id
+        self.uuid = aggregator_uuid
+        self.federation_uuid = federation_uuid
+        #FIXME: Should we do anything to insure the intial model is compressed?
         self.model = load_proto(init_model_fpath)
         self.latest_model_fpath = latest_model_fpath
         self.best_model_fpath = best_model_fpath
-        self.col_ids = col_ids
+        self.collaborator_common_names = collaborator_common_names
         self.round_num = 1
         self.rounds_to_train = rounds_to_train
         self.quit_job_sent_to = []
         self.disable_equality_check = disable_equality_check
-        self.test_mode_whitelist = test_mode_whitelist
+        self.minimum_reporting = minimum_reporting
+        self.straggler_cutoff_time = straggler_cutoff_time
+        self.round_start_time = None
+        self.single_col_cert_common_name = single_col_cert_common_name
+
+        if self.single_col_cert_common_name is not None:
+            self.log_big_warning()
+        else:
+            self.single_col_cert_common_name = '' # FIXME: '' instead of None is just for protobuf compatibility. Cleaner solution?
 
         self.model_update_in_progress = None
 
@@ -74,27 +80,54 @@ class Aggregator(object):
         self.best_model_score = None
         self.mutex = Lock()
 
-    def valid_collaborator_CN_and_id(self, common_name, col_id):
-        # if self.test_mode_whitelist is None, then the common_name must match col_id and be in col_ids
-        if self.test_mode_whitelist is None:
-            return common_name == col_id and col_id in self.col_ids
-        # otherwise, common_name must be in whitelist and col_id must be in col_ids
+        self.compression_pipeline = compression_pipeline or NoCompressionPipeline()
+
+    def valid_collaborator_CN_and_id(self, cert_common_name, collaborator_common_name):
+        """Determine if the collaborator certificate and ID are valid for this federation.
+
+        Args:
+            cert_common_name: Common name for security certificate
+            collaborator_common_name: Common name for collaborator
+
+        Returns:
+            bool: True means the collaborator common name matches the name in the security certificate.
+
+        """
+        # if self.test_mode_whitelist is None, then the common_name must match collaborator_common_name and be in collaborator_common_names
+        if self.single_col_cert_common_name == '':  # FIXME: '' instead of None is just for protobuf compatibility. Cleaner solution?
+            return cert_common_name == collaborator_common_name and collaborator_common_name in self.collaborator_common_names
+        # otherwise, common_name must be in whitelist and collaborator_common_name must be in collaborator_common_names
         else:
-            return common_name in self.test_mode_whitelist and col_id in self.col_ids
+            return cert_common_name == self.single_col_cert_common_name and collaborator_common_name in self.collaborator_common_names
 
     def all_quit_jobs_sent(self):
-        return sorted(self.quit_job_sent_to) == sorted(self.col_ids)
+        """Determines if all collaborators have been sent the QUIT command.
+
+        Returns:
+            bool: True if all collaborators have been sent the QUIT command.
+
+        """
+        return sorted(self.quit_job_sent_to) == sorted(self.collaborator_common_names)
 
     def validate_header(self, message):
-        # validate that the message is for me
-        check_equal(message.header.recipient, self.id, self.logger)
-        
-        # validate that the message is for my federation
-        check_equal(message.header.federation_id, self.fed_id, self.logger)
-        
-        # validate that the sender is one of my collaborators
-        check_is_in(message.header.sender, self.col_ids, self.logger)
+        """Validates the message is from valid collaborator in this federation.
 
+        Returns:
+            bool: True if the message is from a valid collaborator in this federation.
+
+        """
+
+        # validate that the message is for me
+        check_equal(message.header.recipient, self.uuid, self.logger)
+
+        # validate that the message is for my federation
+        check_equal(message.header.federation_id, self.federation_uuid, self.logger)
+
+        # validate that the sender is one of my collaborators
+        check_is_in(message.header.sender, self.collaborator_common_names, self.logger)
+
+        # check that we agree on single_col_cert_common_name
+        check_equal(message.header.single_col_cert_common_name, self.single_col_cert_common_name, self.logger)
 
     def init_per_col_round_stats(self):
         """Initalize the metrics from collaborators for each round of aggregation. """
@@ -102,7 +135,74 @@ class Aggregator(object):
         values = [{} for i in range(len(keys))]
         self.per_col_round_stats = dict(zip(keys, values))
 
+    def collaborator_is_done(self, c):
+        """Determines if a collaborator is finished a round.
+
+        Args:
+            c: Collaborator name
+
+        Returns:
+            bool: True if collaborator c is done.
+
+        """
+        assert c in self.collaborator_common_names
+
+        # FIXME: this only works because we have fixed roles each round
+        return (c in self.per_col_round_stats["loss_results"] and
+                c in self.per_col_round_stats["collaborator_training_sizes"] and
+                c in self.per_col_round_stats["agg_validation_results"] and
+                c in self.per_col_round_stats["preagg_validation_results"] and
+                c in self.per_col_round_stats["collaborator_validation_sizes"])
+
+    def num_collaborators_done(self):
+        """Returns the number of collaborators that have finished the training round.
+
+        Returns:
+            int: The number of collaborators that have finished this round of training.
+
+        """
+        return sum([self.collaborator_is_done(c) for c in self.collaborator_common_names])
+
+    def straggler_time_expired(self):
+        """Determines if there are still collaborators that have not returned past the expected round time.
+        Returns:
+            bool: True if training round limit has expired (i.e. there are straggler collaborators that have not returned in the expected time)
+
+        """
+        return self.round_start_time is not None and ((time.time() - self.round_start_time) > self.straggler_cutoff_time)
+
+    def minimum_collaborators_reported(self):
+        """Determines if enough collaborators have returned to do the aggregation.
+
+        Returns:
+            bool: True if the number of collaborators that have finished is greater than the minimum threshold set.
+
+        """
+        return self.num_collaborators_done() >= self.minimum_reporting
+
+    def straggler_cutoff_check(self):
+        """Determines if a collaborator is finished a round.
+
+        Args:
+            c: Collaborator name
+
+        Returns:
+            bool: True if collaborator c is done.
+
+        """
+        cutoff = self.straggler_time_expired() and self.minimum_collaborators_reported()
+        if cutoff:
+            collaborators_done = [c for c in self.collaborator_common_names if self.collaborator_is_done(c)]
+            self.logger.info('\tEnding round early due to straggler cutoff. Collaborators done: {}'.format(collaborators_done))
+        return cutoff
+
     def end_of_round_check(self):
+        """Determines if it is the end of a training round.
+
+        Returns:
+            bool: True if training round has ended.
+
+        """
         # FIXME: find a nice, clean way to manage these values without having to manually ensure
         # the keys are in sync
 
@@ -110,53 +210,58 @@ class Aggregator(object):
         check_equal(self.per_col_round_stats["loss_results"].keys(), self.per_col_round_stats["collaborator_training_sizes"].keys(), self.logger)
         check_equal(self.per_col_round_stats["agg_validation_results"].keys(), self.per_col_round_stats["collaborator_validation_sizes"].keys(), self.logger)
 
-        done = True
-
-        # ensure we have results from all collaborators
-        # this only works this way because all collaborators have the same jobs every round
-        for c in self.col_ids:
-            if (c not in self.per_col_round_stats["loss_results"] or 
-                c not in self.per_col_round_stats["collaborator_training_sizes"] or 
-                c not in self.per_col_round_stats["agg_validation_results"] or
-                c not in self.per_col_round_stats["preagg_validation_results"] or
-                c not in self.per_col_round_stats["collaborator_validation_sizes"]):
-                done = False
-                break
-
-        if done:
+        # if everyone is done OR our straggler policy calls for an early round end
+        if self.num_collaborators_done() == len(self.collaborator_common_names) or self.straggler_cutoff_check():
             self.end_of_round()
-            self.round_num += 1
-            self.logger.debug("Start a new round %d." % self.round_num)
+
+    def get_weighted_average_of_collaborators(self, value_dict, weight_dict):
+        """Calculate the weighted average of the model updates from the collaborators.
+
+        Args:
+            value_dict: A dictionary of the values (model tensors)
+            weight_dict: A dictionary of the collaborator weights (percentage of total data size)
+
+        Returns:
+            Dictionary of the weights average for all collaborator models
+
+        """
+        cols = [k for k in value_dict.keys() if k in self.collaborator_common_names]
+        return np.average([value_dict[c] for c in cols], weights=[weight_dict[c] for c in cols])
 
     def end_of_round(self):
+        """Runs required tasks when the training round has ended.
+        """
         # FIXME: what all should we do to track results/metrics? It should really be an easy, extensible solution
 
         # compute the weighted loss average
-        round_loss = np.average([self.per_col_round_stats["loss_results"][c] for c in self.col_ids],
-                                weights=[self.per_col_round_stats["collaborator_training_sizes"][c] for c in self.col_ids])
+        round_loss = self.get_weighted_average_of_collaborators(self.per_col_round_stats["loss_results"],
+                                                                self.per_col_round_stats["collaborator_training_sizes"])
 
         # compute the weighted validation average
-        round_val = np.average([self.per_col_round_stats["agg_validation_results"][c] for c in self.col_ids],
-                               weights=[self.per_col_round_stats["collaborator_validation_sizes"][c] for c in self.col_ids])
+        round_val = self.get_weighted_average_of_collaborators(self.per_col_round_stats["agg_validation_results"],
+                                                                self.per_col_round_stats["collaborator_validation_sizes"])
 
         # FIXME: proper logging
         self.logger.info('round results for model id/version {}/{}'.format(self.model.header.id, self.model.header.version))
         self.logger.info('\tvalidation: {}'.format(round_val))
         self.logger.info('\tloss: {}'.format(round_loss))
 
-        # copy over the model update in progress
-        self.model = self.model_update_in_progress
+        # construct the model protobuf from in progress tensors (with incremented version number)
+        self.model = construct_proto(tensor_dict=self.model_update_in_progress["tensor_dict"],
+                                     model_id=self.model.header.id,
+                                     model_version=self.model.header.version + 1,
+                                     is_delta=self.model_update_in_progress["is_delta"],
+                                     delta_from_version=self.model_update_in_progress["delta_from_version"],
+                                     compression_pipeline=self.compression_pipeline)
 
-        # increment the version
-        self.model.header.version += 1
-
-        # Save to file.
+        # Save the new model as latest model.
         dump_proto(self.model, self.latest_model_fpath)
 
         model_score = round_val
         if self.best_model_score is None or self.best_model_score < model_score:
             self.logger.info("Saved the best model with score {:f}.".format(model_score))
             self.best_model_score = model_score
+            # Save a model proto version to file as current best model.
             dump_proto(self.model, self.best_model_fpath)
 
         # clear the update pointer
@@ -164,29 +269,48 @@ class Aggregator(object):
 
         self.init_per_col_round_stats()
 
+        self.round_num += 1
+        self.logger.debug("Start a new round %d." % self.round_num)
+        self.round_start_time = None
+
     def UploadLocalModelUpdate(self, message):
+        """Parses the collaborator reply message to get the collaborator model update
+
+        Args:
+            message: Message from the collaborator
+
+        Returns:
+            The reply to the message (usually just the acknowledgement to the collaborator)
+
+        """
+
         self.mutex.acquire(blocking=True)
         try:
             t = time.time()
             self.validate_header(message)
 
             self.logger.info("Receive model update from %s " % message.header.sender)
-            model_proto = message.model
-            model_header = model_proto.header
+
+            # Get the model parameters from the model proto and additional model info
+            model_tensors = deconstruct_proto(model_proto=message.model, compression_pipeline=self.compression_pipeline)
+            is_delta = message.model.header.is_delta
+            delta_from_version = message.model.header.delta_from_version
 
             # validate this model header
-            check_equal(model_header.id, self.model.header.id, self.logger)
-            check_equal(model_header.version, self.model.header.version, self.logger)
+            check_equal(message.model.header.id, self.model.header.id, self.logger)
+            check_equal(message.model.header.version, self.model.header.version, self.logger)
 
             # ensure we haven't received an update from this collaborator already
             check_not_in(message.header.sender, self.per_col_round_stats["loss_results"], self.logger)
             check_not_in(message.header.sender, self.per_col_round_stats["collaborator_training_sizes"], self.logger)
 
-            # if this is our very first update for the round, we take this model as-is
-            # FIXME: move to model deltas, add with original to reconstructf
+            # if this is our very first update for the round, we take these model tensors as-is
+            # FIXME: move to model deltas, add with original to reconstruct
             # FIXME: this really only works with a trusted collaborator. Sanity check this against self.model
             if self.model_update_in_progress is None:
-                self.model_update_in_progress = model_proto
+                self.model_update_in_progress = {"tensor_dict": model_tensors,
+                                                 "is_delta": is_delta,
+                                                 "delta_from_version": delta_from_version}
 
             # otherwise, we compute the streaming weighted average
             else:
@@ -203,43 +327,31 @@ class Aggregator(object):
 
                 # FIXME: right now we're really using names just to sanity check consistent ordering
 
-                # assert that the models include the same number of tensors
-                check_equal(len(self.model_update_in_progress.tensors), len(model_proto.tensors), self.logger)
+                # check that the models include the same number of tensors, and that whether or not
+                # it is a delta and from what version is the same
+                check_equal(len(self.model_update_in_progress["tensor_dict"]), len(model_tensors), self.logger)
+                check_equal(self.model_update_in_progress["is_delta"], is_delta, self.logger)
+                check_equal(self.model_update_in_progress["delta_from_version"], delta_from_version, self.logger)
 
-                # aggregate all the model tensors in the protobuf
-                # this is a streaming average
-                for i in range(len(self.model_update_in_progress.tensors)):
-                    # global tensor
-                    g = self.model_update_in_progress.tensors[i]
+                # aggregate all the model tensors in the tensor_dict
+                # (weighted average of local update l and global tensor g for all l, g)
+                for name, l in model_tensors.items():
+                    g = self.model_update_in_progress["tensor_dict"][name]
+                    # check that g and l have the same shape
+                    check_equal(g.shape, l.shape, self.logger)
 
-                    # find the local collaborator tensor
-                    l = None
-                    for local_tensor in model_proto.tensors:
-                        if local_tensor.name == g.name:
-                            l = local_tensor
-                            break
-
-                    check_not_equal(l, None, self.logger)
-                    
-                    # sanity check that the tensors are indeed different for non opt tensors 
-                    # TODO: modify this to better comprehend for non pytorch how to identify the opt portion (use model opt info?)               
+                    # sanity check that the tensors are indeed different for non opt tensors
+                    # TODO: modify this to better comprehend for non pytorch how to identify the opt portion (use model opt info?)
                     if (not self.disable_equality_check \
-                        and not g.name.startswith('__opt') \
-                        and 'RMSprop' not in g.name \
-                        and 'Adam' not in g.name \
-                        and 'RMSProp' not in g.name):
-                        check_not_equal(g.npbytes, l.npbytes, self.logger, name=g.name)
-                        
-                    if g.shape != l.shape:
-                        raise ValueError('global tensor shape {} of {} not equal to local tensor shape {} of {}'.format(g.shape, g.name, l.shape, l.name))
+                        and not name.startswith('__opt') \
+                        and 'RMSprop' not in name \
+                        and 'Adam' not in name \
+                        and 'RMSProp' not in name):
+                        check_equal(np.all(g == l), False, self.logger)
 
-                    # now just weighted average these
-                    g_values = np.frombuffer(g.npbytes, dtype=np.float32)
-                    l_values = np.frombuffer(l.npbytes, dtype=np.float32)
-                    new_values = np.average([g_values, l_values], weights=[weight_g, weight_l], axis=0)
-                    del g_values, l_values
-                    # FIXME: we shouldn't convert it to bytes until we are ready to send it back to the collaborators.
-                    self.model_update_in_progress.tensors[i].npbytes = new_values.tobytes('C')
+
+                    # now store a weighted average into the update in progress
+                    self.model_update_in_progress["tensor_dict"][name] = np.average([g, l], weights=[weight_g, weight_l], axis=0)
 
             # store the loss results and training update size
             self.per_col_round_stats["loss_results"][message.header.sender] = message.loss
@@ -258,6 +370,16 @@ class Aggregator(object):
         return reply
 
     def UploadLocalMetricsUpdate(self, message):
+        """Parses the collaborator reply message to get the collaborator metrics (usually the local validation score)
+
+        Args:
+            message: Message from the collaborator
+
+        Returns:
+            The reply to the message (usually just the acknowledgement to the collaborator)
+
+        """
+
         self.mutex.acquire(blocking=True)
         try:
             t = time.time()
@@ -269,7 +391,7 @@ class Aggregator(object):
             # validate this model header
             check_equal(model_header.id, self.model.header.id, self.logger)
             check_equal(model_header.version, self.model.header.version, self.logger)
-            
+
             sender = message.header.sender
 
             if sender not in self.per_col_round_stats["agg_validation_results"]:
@@ -278,7 +400,7 @@ class Aggregator(object):
                 # FIXME: is this an error case that should be handled?
                 check_not_in(message.header.sender, self.per_col_round_stats["agg_validation_results"], self.logger)
                 check_not_in(message.header.sender, self.per_col_round_stats["collaborator_validation_sizes"], self.logger)
-                
+
                 # store the validation results and validation size
                 self.per_col_round_stats["agg_validation_results"][message.header.sender] = message.results
                 self.per_col_round_stats["collaborator_validation_sizes"][message.header.sender] = message.data_size
@@ -300,6 +422,16 @@ class Aggregator(object):
         return reply
 
     def RequestJob(self, message):
+        """Parse message for job request and act accordingly.
+
+        Args:
+            message: Message from the collaborator
+
+        Returns:
+            The reply to the message (usually just the acknowledgement to the collaborator)
+
+        """
+
         t = time.time()
         self.validate_header(message)
 
@@ -324,39 +456,168 @@ class Aggregator(object):
         # else this collaborator is done for the round
         else:
             job = JOB_YIELD
-        
+
         self.logger.debug("Receive job request from %s and assign with %s" % (message.header.sender, job))
 
         reply = JobReply(header=self.create_reply_header(message), job=job)
 
         if reply.job is not JOB_YIELD:
+            # check to see if we need to set our round start time
+            self.mutex.acquire(blocking=True)
+            try:
+                if self.round_start_time is None:
+                    self.round_start_time = time.time()
+            finally:
+                self.mutex.release()
+
             self.logger.debug('aggregator handled RequestJob in time {}'.format(time.time() - t))
-        
-        return reply       
+        elif self.straggler_cutoff_time != np.inf:
+            # we have an idle collaborator and a straggler cutoff time, so we should check for early round end
+            self.mutex.acquire(blocking=True)
+            try:
+                self.end_of_round_check()
+            finally:
+                self.mutex.release()
+
+        return reply
 
     def DownloadModel(self, message):
+        """Sends a model to the collaborator
+
+        Args:
+            message: Message from the collaborator
+
+        Returns:
+            The reply to the message (usually just the acknowledgement to the collaborator)
+
+        """
+
         t = time.time()
         self.validate_header(message)
 
         self.logger.info("Received model download request from %s " % message.header.sender)
 
-        # check if the models don't match
+        # ensure the models don't match
         if not(self.collaborator_out_of_date(message.model_header)):
-            statement = "Assertion failed: self.collaborator_out_of_date(message.model_header)"
+            statement = "Collaborator asking for download when not out of date."
             self.logger.exception(statement)
             raise RuntimeError(statement)
+
+        # check whether there is an issue related to the sending of deltas or non-deltas
+        if message.model_header.version == -1:
+            if self.model.header.is_delta:
+                raise RuntimeError('First collaborator model download, and we only have a delta.')
+        elif message.model_header.is_delta != self.model.header.is_delta:
+            raise RuntimeError('Collaborator requesting non-initial download should hold a model with the same is_delta as aggregated model.')
+        elif message.model_header.is_delta and (message.model_header.delta_from_version != self.model.header.delta_from_version):
+            # TODO: In the future we could send non-delta model here to restore base model.
+            raise NotImplementedError('Base of download model delta does not match current collaborator base, and aggregator restoration of base model not implemented.')
 
         reply = GlobalModelUpdate(header=self.create_reply_header(message), model=self.model)
 
         self.logger.debug('aggregator handled RequestJob in time {}'.format(time.time() - t))
-        
-        return reply       
+
+        return reply
 
     def create_reply_header(self, message):
-        return MessageHeader(sender=self.id, recipient=message.header.sender, federation_id=self.fed_id, counter=message.header.counter)
+        """Creates a header for the reply to the message
+
+        Args:
+            message: Message from the collaborator
+
+        Returns:
+            The message header.
+
+        """
+        return MessageHeader(sender=self.uuid, recipient=message.header.sender, federation_id=self.federation_uuid, counter=message.header.counter, single_col_cert_common_name=self.single_col_cert_common_name)
 
     def collaborator_out_of_date(self, model_header):
+        """Determines if the collaborator has the wrong version of the model (aka out of date)
+
+        Args:
+            model_header: Header for the model
+
+        Returns:
+            The reply to the message (usually just the acknowledgement to the collaborator)
+
+        """
         # validate that this is the right model to be checking
         check_equal(model_header.id, self.model.header.id, self.logger)
-        
+
         return model_header.version != self.model.header.version
+
+    def log_big_warning(self):
+        self.logger.warning("\n{}\nYOU ARE RUNNING IN SINGLE COLLABORATOR CERT MODE! THIS IS NOT PROPER PKI AND SHOULD ONLY BE USED IN DEVELOPMENT SETTINGS!!!! YE HAVE BEEN WARNED!!!".format(the_dragon))
+
+
+the_dragon = """
+
+ ,@@.@@+@@##@,@@@@.`@@#@+  *@@@@ #@##@  `@@#@# @@@@@   @@    @@@@` #@@@ :@@ `@#`@@@#.@
+  @@ #@ ,@ +. @@.@* #@ :`   @+*@ .@`+.   @@ *@::@`@@   @@#  @@  #`;@`.@@ @@@`@`#@* +:@`
+  @@@@@ ,@@@  @@@@  +@@+    @@@@ .@@@    @@ .@+:@@@:  .;+@` @@ ,;,#@` @@ @@@@@ ,@@@* @
+  @@ #@ ,@`*. @@.@@ #@ ,;  `@+,@#.@.*`   @@ ,@::@`@@` @@@@# @@`:@;*@+ @@ @`:@@`@ *@@ `
+ .@@`@@,+@+;@.@@ @@`@@;*@  ;@@#@:*@+;@  `@@;@@ #@**@+;@ `@@:`@@@@  @@@@.`@+ .@ +@+@*,@
+  `` ``     ` ``  .     `     `      `     `    `  .` `  ``   ``    ``   `       .   `
+
+
+
+                                            .**
+                                      ;`  `****:
+                                     @**`*******
+                         ***        +***********;
+                        ,@***;` .*:,;************
+                        ;***********@@***********
+                        ;************************,
+                        `*************************
+                         *************************
+                         ,************************
+                          **#*********************
+                          *@****`     :**********;
+                          +**;          .********.
+                          ;*;            `*******#:                       `,:
+                                          ****@@@++::                ,,;***.
+                                          *@@@**;#;:         +:      **++*,
+                                          @***#@@@:          +*;     ,****
+                                          @*@+****           ***`     ****,
+                                         ,@#******.  ,       ****     **;,**.
+                                         * ******** :,       ;*:*+    **  :,**
+                                        #  ********::      *,.*:**`   *      ,*;
+                                        .  *********:      .+,*:;*:   :      `:**
+                                       ;   :********:       ***::**   `       ` **
+                                       +   :****::***  ,    *;;::**`             :*
+                                      ``   .****::;**:::    *;::::*;              ;*
+                                      *     *****::***:.    **::::**               ;:
+                                      #     *****;:****     ;*::;***               ,*`
+                                      ;     ************`  ,**:****;               ::*
+                                      :     *************;:;*;*++:                   *.
+                                      :     *****************;*                      `*
+                                     `.    `*****************;  :                     *.
+                                     .`    .*+************+****;:                     :*
+                                     `.    :;+***********+******;`    :              .,*
+                                      ;    ::*+*******************. `::              .`:.
+                                      +    :::**********************;;:`                *
+                                      +    ,::;*************;:::*******.                *
+                                      #    `:::+*************:::;********  :,           *
+                                      @     :::***************;:;*********;:,           *
+                                      @     ::::******:*********************:         ,:*
+                                      @     .:::******:;*********************,         :*
+                                      #      :::******::******###@*******;;****        *,
+                                      #      .::;*****::*****#****@*****;:::***;  ``  **
+                                      *       ::;***********+*****+#******::*****,,,,**
+                                      :        :;***********#******#******************
+                                      .`       `;***********#******+****+************
+                                      `,        ***#**@**+***+*****+**************;`
+                                       ;         *++**#******#+****+`      `.,..
+                                       +         `@***#*******#****#
+                                       +          +***@********+**+:
+                                       *         .+**+;**;;;**;#**#
+                                      ,`         ****@         +*+:
+                                      #          +**+         :+**
+                                      @         ;**+,       ,***+
+                                      #      #@+****      *#****+
+                                     `;     @+***+@      `#**+#++
+                                     #      #*#@##,      .++:.,#
+                                    `*      @#            +.
+                                  @@@
+                                 #`@
+                                  ,                                                        """
