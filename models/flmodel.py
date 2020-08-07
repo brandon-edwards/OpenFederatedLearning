@@ -182,8 +182,17 @@ class FLModel(object):
         # loop over inference data
         ret = []
         for sample in self.data.get_inference_loader():
-            features = sample["features"]
-            metadata = sample["metadata"]
+            # FIXME: Need something cleaner, and metadata should be consumed as kwargs
+            if isinstance(sample, dict) and "features" in sample and "metadata" in sample:
+                features = sample["features"]
+                metadata = sample["metadata"]
+            else:
+                # FIXME: this abstraction needs love. The inference loader should take care of all of this.
+                if isinstance(sample, list):
+                    features = sample[0]
+                else:
+                    features = sample
+                metadata = None
             outputs = self.infer_batch(features)
             ret.append(self.data.write_outputs(outputs, metadata))
         return ret
