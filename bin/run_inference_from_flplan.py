@@ -31,7 +31,7 @@ def remove_and_save_holdout_tensors(tensor_dict):
         return shared_tensors, holdout_tensors
 
 
-def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, logging_config_fname, logging_default_level):
+def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, logging_config_path, logging_default_level, logging_directory):
     """Runs the inference according to the flplan, data-dir and weights file. Output format is determined by the data object in the flplan
 
     Args:
@@ -43,7 +43,6 @@ def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, 
         logging_default_level (string)  : The log level
 
     """
-    setup_logging(path=logging_config_fname, default_level=logging_default_level)
 
     if model_weights_filename is not None and native_model_weights_filepath is not None:
         sys.exit("Parameters model_weights_filename and native_model_weights_filepath are mutually exclusive.\nmodel_weights_file was set to {}\native_model_weights_filepath was set to {}".format(model_weights_filename, native_model_weights_filepath))
@@ -52,6 +51,9 @@ def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, 
     script_dir = os.path.dirname(os.path.realpath(__file__))
     base_dir = os.path.join(script_dir, 'federations')
     plan_dir = os.path.join(base_dir, 'plans')
+    logging_directory = os.path.join(script_dir, logging_directory)
+
+    setup_logging(path=logging_config_path, default_level=logging_default_level, logging_directory=logging_directory)
 
     flplan = parse_fl_plan(os.path.join(plan_dir, plan))
 
@@ -86,6 +88,7 @@ def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, 
         model.load_native(native_model_weights_filepath)
     else:
         sys.exit("One of model_weights_filename or native_model_weights_filepath is required.")
+
     # finally, call the model object's run_inference_and_store_results with the kwargs from the inference block
     # FIXME: Setting these kwargs to empty for now
     inference_kwargs = {}
@@ -99,7 +102,8 @@ if __name__ == '__main__':
     group.add_argument('--model_weights_filename', '-mwf', type=str, default=None)
     group.add_argument('--native_model_weights_filepath', '-nmwf', type=str, default=None)
     parser.add_argument('--data_dir', '-d', type=str, default=None, required=True)
-    parser.add_argument('--logging_config_fname', '-lc', type=str, default="logging.yaml")
+    parser.add_argument('--logging_config_path', '-lc', type=str, default="logging.yaml")
     parser.add_argument('--logging_default_level', '-l', type=str, default="info")
+    parser.add_argument('--logging_directory', '-ld', type=str, default="logs")
     args = parser.parse_args()
     main(**vars(args))

@@ -10,12 +10,13 @@ import logging
 import importlib
 
 from tfedlrn import load_yaml, get_object, split_tensor_dict_for_holdouts
+from tfedlrn.collaborator.collaborator import OptTreatment
 from tfedlrn.flplan import parse_fl_plan, create_data_object, create_model_object, create_compression_pipeline
 from tfedlrn.proto.protoutils import dump_proto, construct_proto
 from setup_logging import setup_logging
 
 
-def main(plan, collaborators_file, feature_shape, data_config_fname, logging_config_path, logging_default_level):
+def main(plan, native_model_weights_filepath, collaborators_file, feature_shape, data_config_fname, logging_config_path, logging_default_level):
     """Creates a protobuf file of the initial weights for the model
 
     Uses the federation (FL) plan to create an initial weights file
@@ -23,6 +24,7 @@ def main(plan, collaborators_file, feature_shape, data_config_fname, logging_con
 
     Args:
         plan: The federation (FL) plan filename
+        native_model_weights_filepath: A framework-specific filepath. Path will be relative to the working directory.
         collaborators_file:
         feature_shape: The input shape to the model
         data_config_fname: The data configuration file (defines where the datasets are located)
@@ -62,17 +64,31 @@ def main(plan, collaborators_file, feature_shape, data_config_fname, logging_con
         collaborator_common_name = load_yaml(os.path.join(base_dir, 'collaborator_lists', collaborators_file))['collaborator_common_names'][0]
         data = create_data_object(flplan, collaborator_common_name, local_config)
     else:
-        data = get_object('data.dummy', 'RandomData', feature_shape=feature_shape)
+        data = get_object('data.dummy.randomdata', 'RandomData', feature_shape=feature_shape)
         logger.info('Using data object of type {} and feature shape {}'.format(type(data), feature_shape))
 
     # create the model object and compression pipeline
     wrapped_model = create_model_object(flplan, data)
     compression_pipeline = create_compression_pipeline(flplan)
+
+    # determine if we need to store the optimizer variables
+    # FIXME: what if this key is missing?
+    try:
+        opt_treatment = OptTreatment[flplan['collaborator_object_init']['init_kwargs']['opt_treatment']]
+    except KeyError:
+        # FIXME: this error message should use the exception to determine the missing key and the Enum to display the options dynamically
+        sys.exit("FL plan must specify ['collaborator_object_init']['init_kwargs']['opt_treatment'] as [RESET|CONTINUE_LOCAL|CONTINUE_GLOBAL]")
+
+    # FIXME: this should be an "opt_treatment requires parameters type check rather than a magic string"
+    with_opt_vars = opt_treatment == OptTreatment['CONTINUE_GLOBAL']
+
+    if native_model_weights_filepath is not None:
+        wrapped_model.load_native(native_model_weights_filepath)
     
     tensor_dict_split_fn_kwargs = wrapped_model.tensor_dict_split_fn_kwargs or {}
 
     tensor_dict, holdout_params = split_tensor_dict_for_holdouts(logger,
-                                                                 wrapped_model.get_tensor_dict(False),
+                                                                 wrapped_model.get_tensor_dict(with_opt_vars=with_opt_vars),
                                                                  **tensor_dict_split_fn_kwargs)
     logger.warn('Following paramters omitted from global initial model, '\
                 'local initialization will determine values: {}'.format(list(holdout_params.keys())))
@@ -92,6 +108,7 @@ def main(plan, collaborators_file, feature_shape, data_config_fname, logging_con
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--plan', '-p', type=str, required=True)
+    parser.add_argument('--native_model_weights_filepath', '-nmwf', type=str, default=None)
     parser.add_argument('--collaborators_file', '-c', type=str, default=None, help="Name of YAML File in /bin/federations/collaborator_lists/")
     parser.add_argument('--feature_shape', '-fs', type=int, nargs='+', default=None)
     parser.add_argument('--data_config_fname', '-dc', type=str, default="local_data_config.yaml")

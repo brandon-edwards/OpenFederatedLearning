@@ -66,3 +66,15 @@ class FLData(object):
             int: number of validation samples
         """
         raise NotImplementedError
+
+    def write_outputs(self, outputs, metadata=None):
+        """Writes models outputs to storage according to the passed metadata.
+
+        Args:
+            outputs     : Typically the results of the model.infer_batch() call
+            metadata    : Additional parameters needed to convert model outputs to file, such as metadata for images
+
+        Returns:
+            list of strings: filepaths of written files.            
+        """
+        raise NotImplementedError

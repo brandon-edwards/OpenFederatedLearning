@@ -3,7 +3,7 @@
 
 from data import load_mnist_shard
 from data.pytorch.ptfldata_inmemory import PyTorchFLDataInMemory
-
+import logging
 
 class PyTorchMNISTInMemory(PyTorchFLDataInMemory):
     """PyTorch data loader for MNIST dataset
@@ -19,16 +19,30 @@ class PyTorchMNISTInMemory(PyTorchFLDataInMemory):
         """
         super().__init__(batch_size, **kwargs)
 
-        _, num_classes, X_train, y_train, X_val, y_val = load_mnist_shard(shard_num=data_path, **kwargs)
+        _, num_classes, X_train, y_train, X_val, y_val = load_mnist_shard(shard_num=int(data_path), **kwargs)
 
         self.training_data_size = len(X_train)
         self.validation_data_size = len(X_val)
         self.num_classes = num_classes
         self.train_loader = self.create_loader(X=X_train, y=y_train, shuffle=True)
         self.val_loader = self.create_loader(X=X_val, y=y_val, shuffle=False)
-    
-    
 
+        # FIXME: this is just to test the functionality. Needs fixed when we move away from downloaded data
+        self.inference_loader = self.create_loader(X=X_val, shuffle=False)
 
+    def write_outputs(self, outputs, metadata=None):
+        """Writes models outputs to storage according to the passed metadata.
 
-        
+        Args:
+            outputs     : Typically the results of the model.infer_batch() call
+            metadata    : Not used.
+
+        Returns:
+            list of strings: filepaths of written files.            
+        """
+        # Currently just a test implementation
+        logger = logging.getLogger("inference")
+        logger.info(str(outputs))
+
+        # does not write
+        return []

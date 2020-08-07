@@ -91,7 +91,7 @@ class PyTorchFLDataInMemory(FLData):
         return self.validation_data_size
 
 
-    def create_loader(self, X, y, shuffle):
+    def create_loader(self, X, y=None, shuffle=True):
         """Create the data loader using the Torch Tensor methods
 
         Args:

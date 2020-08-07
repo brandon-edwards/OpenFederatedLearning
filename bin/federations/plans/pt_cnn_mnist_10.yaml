@@ -33,3 +33,6 @@ model_object_init:
 
 network_object_init:
   defaults_file: defaults/network.yaml
+
+inference:
+  allowed: true
