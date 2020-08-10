@@ -21,7 +21,7 @@ class TensorFlowMNISTInMemory(TensorFlowFLDataInMemory):
 
         super().__init__(batch_size)
 
-        _, num_classes, X_train, y_train, X_val, y_val = load_mnist_shard(shard_num=data_path, **kwargs)
+        _, num_classes, X_train, y_train, X_val, y_val = load_mnist_shard(shard_num=int(data_path), **kwargs)
 
         self.X_train = X_train
         self.y_train = y_train

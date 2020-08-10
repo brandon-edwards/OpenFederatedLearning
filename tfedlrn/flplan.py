@@ -173,17 +173,22 @@ def create_collaborator_network_object(flplan, collaborator_common_name, single_
                                   **config['init_kwargs'])
 
 
+# FIXME: data_dir should be data_path
 def create_collaborator_object_from_flplan(flplan, 
                                            collaborator_common_name, 
                                            local_config,
                                            base_dir,
                                            single_col_cert_common_name=None,
+                                           data_dir=None,
                                            data_object=None,
                                            model_object=None,
                                            compression_pipeline=None,
                                            network_object=None):
     if data_object is None:
-        data_object = create_data_object(flplan, collaborator_common_name, local_config)
+        if data_dir is None:
+            data_object = create_data_object(flplan, collaborator_common_name, local_config)
+        else:
+            data_object = create_data_object_with_explicit_data_path(flplan, data_path=data_dir)
 
     if model_object is None:
         model_object = create_model_object(flplan, data_object)
@@ -202,6 +207,7 @@ def create_collaborator_object_from_flplan(flplan,
                         **flplan['collaborator_object_init']['init_kwargs'])
 
 
+# FIXME: Should these two functions be one with different behavior based on parameters?
 def create_data_object(flplan, collaborator_common_name, local_config, **kwargs):
     data_path = get_data_path_from_local_config(local_config,
                                                 collaborator_common_name,

@@ -65,7 +65,7 @@ def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, 
         sys.exit("FL Plan must contain a {'inference: {'allowed': True}} entry in order for inference to be allowed.")
 
     # create the data object
-    data = create_data_object_with_explicit_data_path(flplan=flplan, data_path=data_dir)
+    data = create_data_object(flplan=flplan, data_path=data_dir)
 
     # create the model object
     model = create_model_object(flplan, data)
