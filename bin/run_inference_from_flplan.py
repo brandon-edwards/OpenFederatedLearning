@@ -101,6 +101,7 @@ if __name__ == '__main__':
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--model_weights_filename', '-mwf', type=str, default=None)
     group.add_argument('--native_model_weights_filepath', '-nmwf', type=str, default=None)
+    # FIXME: data_dir should be data_path
     parser.add_argument('--data_dir', '-d', type=str, default=None, required=True)
     parser.add_argument('--logging_config_path', '-lc', type=str, default="logging.yaml")
     parser.add_argument('--logging_default_level', '-l', type=str, default="info")

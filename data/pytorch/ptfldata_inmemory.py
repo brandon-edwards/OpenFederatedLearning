@@ -118,8 +118,3 @@ class PyTorchFLDataInMemory(FLData):
             return torch.utils.data.DataLoader(dataset=torch.utils.data.TensorDataset(tX, ty), 
                                                batch_size=self.batch_size, 
                                                shuffle=shuffle)
-
-
-
-
-        

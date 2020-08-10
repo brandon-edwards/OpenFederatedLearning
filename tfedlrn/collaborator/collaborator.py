@@ -70,10 +70,14 @@ class Collaborator(object):
                  num_batches_per_round=None,
                  send_model_deltas = False,
                  single_col_cert_common_name=None,
+                 save_best_native_path=None,
+                 save_best_native_kwargs=None,
                  **kwargs):
         self.logger = logging.getLogger(__name__)
         self.channel = channel
         self.polling_interval = polling_interval
+        self.save_best_native_path = save_best_native_path
+        self.save_best_native_kwargs = save_best_native_kwargs
 
         # this stuff is really about sanity/correctness checking to ensure the bookkeeping and control flow is correct
         self.common_name = collaborator_common_name
@@ -409,7 +413,6 @@ class Collaborator(object):
         # restore any tensors held out from aggregation
         tensor_dict = {**agg_tensor_dict, **self.holdout_tensors}
 
-
         if self.opt_treatment == OptTreatment.CONTINUE_GLOBAL:
             with_opt_vars = True
         else:
@@ -423,6 +426,11 @@ class Collaborator(object):
 
         self.wrapped_model.set_tensor_dict(tensor_dict, with_opt_vars=with_opt_vars)
         self.logger.debug("Loaded the model.")
+
+        # if we are supposed to save the best model and the model is the best, we save it
+        if reply.is_global_best and self.save_best_native_path:
+            self.wrapped_model.save_native(self.save_best_native_path, self.save_best_native_kwargs)
+            self.logger.info("Saving best model to {}".format(self.save_best_native_path))
 
         # FIXME: for the CONTINUE_LOCAL treatment, we need to store the status in case of a crash.
         if self.opt_treatment == OptTreatment.RESET:

@@ -78,6 +78,7 @@ class Aggregator(object):
 
         self.init_per_col_round_stats()
         self.best_model_score = None
+        self.aggregated_model_is_global_best = True
         self.mutex = Lock()
 
         self.compression_pipeline = compression_pipeline or NoCompressionPipeline()
@@ -263,6 +264,9 @@ class Aggregator(object):
             self.best_model_score = model_score
             # Save a model proto version to file as current best model.
             dump_proto(self.model, self.best_model_fpath)
+            self.aggregated_model_is_global_best = True
+        else:
+            self.aggregated_model_is_global_best = False
 
         # clear the update pointer
         self.model_update_in_progress = None
@@ -513,7 +517,7 @@ class Aggregator(object):
             # TODO: In the future we could send non-delta model here to restore base model.
             raise NotImplementedError('Base of download model delta does not match current collaborator base, and aggregator restoration of base model not implemented.')
 
-        reply = GlobalModelUpdate(header=self.create_reply_header(message), model=self.model)
+        reply = GlobalModelUpdate(header=self.create_reply_header(message), model=self.model, is_global_best=self.aggregated_model_is_global_best)
 
         self.logger.debug('aggregator handled RequestJob in time {}'.format(time.time() - t))
 

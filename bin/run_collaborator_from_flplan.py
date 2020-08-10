@@ -30,6 +30,7 @@ def main(plan, collaborator_common_name, single_col_cert_common_name, data_confi
     script_dir = os.path.dirname(os.path.realpath(__file__))
     base_dir = os.path.join(script_dir, 'federations')
     plan_dir = os.path.join(base_dir, 'plans')
+    weights_dir = os.path.join(base_dir, 'weights')
     logging_config_path = os.path.join(script_dir, logging_config_path)
     logging_directory = os.path.join(script_dir, logging_directory)
 
@@ -39,7 +40,7 @@ def main(plan, collaborator_common_name, single_col_cert_common_name, data_confi
 
     local_config = load_yaml(os.path.join(base_dir, data_config_fname))
 
-    collaborator = create_collaborator_object_from_flplan(flplan, collaborator_common_name, local_config, base_dir, single_col_cert_common_name, data_dir=data_dir)
+    collaborator = create_collaborator_object_from_flplan(flplan, collaborator_common_name, local_config, base_dir, weights_dir, single_col_cert_common_name, data_dir=data_dir)
 
     collaborator.run()
 

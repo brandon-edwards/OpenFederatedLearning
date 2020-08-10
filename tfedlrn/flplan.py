@@ -178,6 +178,7 @@ def create_collaborator_object_from_flplan(flplan,
                                            collaborator_common_name, 
                                            local_config,
                                            base_dir,
+                                           weights_dir,
                                            single_col_cert_common_name=None,
                                            data_dir=None,
                                            data_object=None,
@@ -198,6 +199,13 @@ def create_collaborator_object_from_flplan(flplan,
 
     if network_object is None:
         network_object = create_collaborator_network_object(flplan, collaborator_common_name, single_col_cert_common_name, base_dir)
+
+    init_kwargs = {}
+    # patch in weights dir for native model filepath
+    if 'init_kwargs' in flplan['collaborator_object_init']:
+        init_kwargs = flplan['collaborator_object_init']['init_kwargs']
+        if 'save_best_native_path' in init_kwargs:
+            init_kwargs['save_best_native_path'] = os.path.join(weights_dir, init_kwargs['save_best_native_path'])
 
     return Collaborator(collaborator_common_name=collaborator_common_name,
                         wrapped_model=model_object, 
