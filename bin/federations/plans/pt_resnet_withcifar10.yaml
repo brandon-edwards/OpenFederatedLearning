@@ -30,8 +30,6 @@ data_object_init:
 
 model_object_init:
   class_to_init: models.pytorch.pt_resnet.pt_resnet.PyTorchResnet
-  init_kwargs:
-    device: cuda
 
 network_object_init:
   defaults_file: defaults/network.yaml

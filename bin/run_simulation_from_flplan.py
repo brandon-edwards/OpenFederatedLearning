@@ -13,7 +13,7 @@ from single_proc_fed    import federate
 from setup_logging      import setup_logging
 
 
-def main(plan, collaborators_file, data_config_fname, logging_config_path, logging_default_level, logging_directory, **kwargs):
+def main(plan, collaborators_file, data_config_fname, logging_config_path, logging_default_level, logging_directory, model_device, **kwargs):
     """Run the federation simulation from the federation (FL) plan.
 
     Runs a federated training from the federation (FL) plan but creates the
@@ -54,7 +54,8 @@ def main(plan, collaborators_file, data_config_fname, logging_config_path, loggi
              local_config,
              collaborator_common_names,
              base_dir,
-             weights_dir)
+             weights_dir,
+             model_device)
 
 
 if __name__ == '__main__':
@@ -65,5 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('--logging_config_path', '-lcp', type=str, default="logging.yaml")
     parser.add_argument('--logging_default_level', '-l', type=str, default="info")
     parser.add_argument('--logging_directory', '-ld', type=str, default="logs")
+    # FIXME: this kind of commandline configuration needs to be done in a consistent way
+    parser.add_argument('--model_device', '-md', type=str, default='cpu')
     args = parser.parse_args()
     main(**vars(args))

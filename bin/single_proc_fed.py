@@ -11,13 +11,14 @@ def federate(flplan,
              local_config,
              collaborator_common_names,
              base_dir,
-             weights_dir):   
+             weights_dir,
+             model_device):   
 
     # create the data objects for each collaborator
     data_objects = {collaborator_common_name: create_data_object(flplan, collaborator_common_name, local_config)  for collaborator_common_name in collaborator_common_names}
     
     # instantiate the model (using the first collaborator dataset for now)
-    model = create_model_object(flplan, data_objects[collaborator_common_names[0]])
+    model = create_model_object(flplan, data_objects[collaborator_common_names[0]], model_device)
     
     # FL collaborators are statefull. Since this single process script utilizes one
     # shared model for all collaborators, model states need to be tracked.

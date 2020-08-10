@@ -83,8 +83,8 @@ def create_compression_pipeline(flplan):
     return compression_pipeline
 
 
-def create_model_object(flplan, data_object):
-    return init_object(flplan['model_object_init'], data=data_object)
+def create_model_object(flplan, data_object, model_device='cpu'):
+    return init_object(flplan['model_object_init'], data=data_object, device=model_device)
 
 
 def resolve_autoport(flplan):
@@ -184,7 +184,8 @@ def create_collaborator_object_from_flplan(flplan,
                                            data_object=None,
                                            model_object=None,
                                            compression_pipeline=None,
-                                           network_object=None):
+                                           network_object=None,
+                                           model_device=None):
     if data_object is None:
         if data_dir is None:
             data_object = create_data_object(flplan, collaborator_common_name, local_config)
@@ -192,7 +193,7 @@ def create_collaborator_object_from_flplan(flplan,
             data_object = create_data_object_with_explicit_data_path(flplan, data_path=data_dir)
 
     if model_object is None:
-        model_object = create_model_object(flplan, data_object)
+        model_object = create_model_object(flplan, data_object, model_device=model_device)
     
     if compression_pipeline is None:
         compression_pipeline = create_compression_pipeline(flplan)
