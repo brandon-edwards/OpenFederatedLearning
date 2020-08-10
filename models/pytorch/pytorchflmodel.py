@@ -182,9 +182,12 @@ class PyTorchFLModel(nn.Module, FLModel):
         Returns:
             None
         """
-        pickle_dict = torch.load(filepath)
+        pickle_dict = torch.load(filepath, map_location=torch.device(self.device))
         self.load_state_dict(pickle_dict[model_state_dict_key])
-        self.optimizer.load_state_dict(pickle_dict[optimizer_state_dict_key])
+        if optimizer_state_dict_key in pickle_dict.keys():
+            self.optimizer.load_state_dict(pickle_dict[optimizer_state_dict_key])
+        else:
+            print("\n\nSkipping the setting of optimizer state since provided key was not found!!!\n\n")
 
     def save_native(self, filepath, model_state_dict_key='model_state_dict', optimizer_state_dict_key='optimizer_state_dict', **kwargs):
         """Saves model and optimizer states in a picked file specified by the filepath. model_/optimizer_state_dicts are stored in the keys provided. Uses torch.save().

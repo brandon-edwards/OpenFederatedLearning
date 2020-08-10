@@ -30,14 +30,15 @@
 aggregator_object_init:
   init_kwargs:
     rounds_to_train: 5
-    init_model_fname: pt_3dresunet_brainmagebrats_init.pbuf
-    latest_model_fname: pt_3dresunet_brainmagebrats_latest.pbuf
-    best_model_fname: pt_3dresunet_brainmagebrats_best.pbuf
+    init_model_fname: pt_3dresunet_ss_brainmagebrats_init.pbuf
+    latest_model_fname: pt_3dresunet_ss_brainmagebrats_latest.pbuf
+    best_model_fname: pt_3dresunet_ss_brainmagebrats_best.pbuf
 
 model_object_init:
   class_to_init: fets.models.pytorch.pt_3dresunet.pt_3dresunet.PyTorch3DResUNet
   init_kwargs:
-    base_filters: 30
+    device: cpu
+    base_filters: 16
     learning_rate: 1
     loss_function: dc
     opt: adam
@@ -60,10 +61,10 @@ data_object_init:
     patch_size: [128,128,128]
     feature_modes: ["_t1.nii", "_t2.nii", "_flair.nii", "_t1ce.nii"]
     divisibility_factor: 16
-    class_label_map: {0: 0, 1: 1, 2: 1, 4: 1}
+    class_label_map: {0: 0, 1: 1}
 
 inference:
   allowed: True
   kwargs:
-    output_file_tag: 'resunet_seg'
+    output_file_tag: 'skull_stripper_seg'
   

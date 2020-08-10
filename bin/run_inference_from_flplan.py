@@ -65,7 +65,7 @@ def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, 
         sys.exit("FL Plan must contain a {'inference: {'allowed': True}} entry in order for inference to be allowed.")
 
     # create the data object
-    data = create_data_object(flplan=flplan, data_path=data_dir)
+    data = create_data_object_with_explicit_data_path(flplan=flplan, data_path=data_dir)
 
     # create the model object
     model = create_model_object(flplan, data)
@@ -90,8 +90,7 @@ def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, 
         sys.exit("One of model_weights_filename or native_model_weights_filepath is required.")
 
     # finally, call the model object's run_inference_and_store_results with the kwargs from the inference block
-    # FIXME: Setting these kwargs to empty for now
-    inference_kwargs = {}
+    inference_kwargs = flplan['inference'].get('kwargs') or {}
     model.run_inference_and_store_results(**inference_kwargs)
 
 

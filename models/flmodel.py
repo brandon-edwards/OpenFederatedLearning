@@ -169,8 +169,10 @@ class FLModel(object):
         """
         raise NotImplementedError
 
-    def run_inference_and_store_results(self):
+    def run_inference_and_store_results(self, **kwargs):
         """Runs inference over the inference_loader in the data object, then calls the data object to store the results.
+        Args:
+            kwargs: For write_outputs method of self.data
         
         Returns:
             List of outputs from the data.write_output calls
@@ -194,7 +196,7 @@ class FLModel(object):
                     features = sample
                 metadata = None
             outputs = self.infer_batch(features)
-            ret.append(self.data.write_outputs(outputs, metadata))
+            ret.append(self.data.write_outputs(outputs, metadata, **kwargs))
         return ret
     
     def infer_batch(self, X):
