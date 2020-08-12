@@ -91,7 +91,7 @@ install_openfl_pytorch: $(openfl_pytorch) $(openfl)
 
 install_openfl_tensorflow: $(openfl_tensorflow) $(openfl)
 
-install_fets: $(fets) $(openfl_pytorch)
+install_fets: $(fets) $(openfl_pytorch) $(openfl)
 
 install: install_openfl install_openfl_pytorch install_openfl_tensorflow install_fets
 
@@ -117,7 +117,11 @@ uninstall_fets:
 	venv/bin/pip uninstall -y fets
 
 # the reinstall recipe does everything by default
-reinstall: uninstall install
+reinstall					: uninstall 					install
+reinstall_openfl			: uninstall_openfl 				install_openfl
+reinstall_openfl_tensorflow	: uninstall_openfl_tensorflow 	install_openfl_tensorflow
+reinstall_openfl_pytorch	: uninstall_openfl_pytorch 		install_openfl_pytorch
+reinstall_fets				: uninstall_fets 				install_fets
 
 # blows up the venv
 clean:
