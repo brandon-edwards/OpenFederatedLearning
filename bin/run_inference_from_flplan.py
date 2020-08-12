@@ -9,10 +9,10 @@ import os
 import logging
 import importlib
 
-from tfedlrn import split_tensor_dict_for_holdouts
-from tfedlrn.tensor_transformation_pipelines import NoCompressionPipeline
-from tfedlrn.proto.protoutils import deconstruct_proto, load_proto
-from tfedlrn.flplan import create_data_object_with_explicit_data_path, parse_fl_plan, create_model_object
+from openfl import split_tensor_dict_for_holdouts
+from openfl.tensor_transformation_pipelines import NoCompressionPipeline
+from openfl.proto.protoutils import deconstruct_proto, load_proto
+from openfl.flplan import create_data_object_with_explicit_data_path, parse_fl_plan, create_model_object
 from setup_logging import setup_logging
 
 def remove_and_save_holdout_tensors(tensor_dict):

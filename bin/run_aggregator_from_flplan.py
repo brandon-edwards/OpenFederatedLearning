@@ -7,7 +7,7 @@ import argparse
 import os
 import logging
 
-from tfedlrn.flplan import parse_fl_plan, load_yaml, create_aggregator_object_from_flplan, create_aggregator_server_from_flplan, get_serve_kwargs_from_flpan
+from openfl.flplan import parse_fl_plan, load_yaml, create_aggregator_object_from_flplan, create_aggregator_server_from_flplan, get_serve_kwargs_from_flpan
 from setup_logging import setup_logging
 
 

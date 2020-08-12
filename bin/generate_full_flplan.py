@@ -9,7 +9,7 @@ import os
 
 import yaml
 
-from tfedlrn.flplan import parse_fl_plan
+from openfl.flplan import parse_fl_plan
 
 
 def main(plan, out_filepath):

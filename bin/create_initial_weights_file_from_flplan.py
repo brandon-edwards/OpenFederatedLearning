@@ -9,10 +9,10 @@ import sys
 import logging
 import importlib
 
-from tfedlrn import load_yaml, get_object, split_tensor_dict_for_holdouts
-from tfedlrn.collaborator.collaborator import OptTreatment
-from tfedlrn.flplan import parse_fl_plan, create_data_object, create_model_object, create_compression_pipeline
-from tfedlrn.proto.protoutils import dump_proto, construct_proto
+from openfl import load_yaml, get_object, split_tensor_dict_for_holdouts
+from openfl.collaborator.collaborator import OptTreatment
+from openfl.flplan import parse_fl_plan, create_data_object, create_model_object, create_compression_pipeline
+from openfl.proto.protoutils import dump_proto, construct_proto
 from setup_logging import setup_logging
 
 

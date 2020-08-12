@@ -18,8 +18,8 @@ from ..proto.collaborator_aggregator_interface_pb2 import ModelDownloadRequest, 
 from ..proto.collaborator_aggregator_interface_pb2 import LocalModelUpdate, LocalValidationResults, LocalModelUpdateAck, LocalValidationResultsAck
 
 
-from tfedlrn.proto.protoutils import dump_proto, load_proto, construct_proto, deconstruct_proto
-from tfedlrn.tensor_transformation_pipelines import NoCompressionPipeline
+from openfl.proto.protoutils import dump_proto, load_proto, construct_proto, deconstruct_proto
+from openfl.tensor_transformation_pipelines import NoCompressionPipeline
 
 # FIXME: simpler "stats" collection/handling
 # FIXME: remove the round tracking/job-result tracking stuff from this?

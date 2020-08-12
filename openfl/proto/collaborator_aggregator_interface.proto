@@ -3,7 +3,7 @@
 
 syntax = 'proto3';
 
-package tfedlrn_proto;
+package openfl_proto;
 
 // we start with everything as "required" while developing / debugging. This forces correctness better.
 // FIXME: move to "optional" once development is complete

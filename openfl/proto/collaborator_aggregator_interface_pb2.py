@@ -16,15 +16,15 @@ _sym_db = _symbol_database.Default()
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='collaborator_aggregator_interface.proto',
-  package='tfedlrn_proto',
+  package='openfl_proto',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\'collaborator_aggregator_interface.proto\x12\rtfedlrn_proto\"+\n\nDataStream\x12\x0c\n\x04size\x18\x01 \x01(\r\x12\x0f\n\x07npbytes\x18\x02 \x01(\x0c\"\xab\x01\n\rMetadataProto\x12\x42\n\x0cint_to_float\x18\x01 \x03(\x0b\x32,.tfedlrn_proto.MetadataProto.IntToFloatEntry\x12\x10\n\x08int_list\x18\x02 \x03(\x05\x12\x11\n\tbool_list\x18\x03 \x03(\x08\x1a\x31\n\x0fIntToFloatEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\x02:\x02\x38\x01\"k\n\x0bTensorProto\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x12\n\ndata_bytes\x18\x03 \x01(\x0c\x12:\n\x14transformer_metadata\x18\x04 \x03(\x0b\x32\x1c.tfedlrn_proto.MetadataProto\"\x7f\n\rMessageHeader\x12\x0e\n\x06sender\x18\x01 \x01(\t\x12\x11\n\trecipient\x18\x02 \x01(\t\x12\x15\n\rfederation_id\x18\x03 \x01(\t\x12\x0f\n\x07\x63ounter\x18\x04 \x01(\x05\x12#\n\x1bsingle_col_cert_common_name\x18\x05 \x01(\t\"X\n\x0bModelHeader\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08is_delta\x18\x02 \x01(\x08\x12\x1a\n\x12\x64\x65lta_from_version\x18\x03 \x01(\x05\x12\x0f\n\x07version\x18\x04 \x01(\x05\"e\n\nModelProto\x12*\n\x06header\x18\x01 \x01(\x0b\x32\x1a.tfedlrn_proto.ModelHeader\x12+\n\x07tensors\x18\x02 \x03(\x0b\x32\x1a.tfedlrn_proto.TensorProto\"\x8b\x01\n\x10LocalModelUpdate\x12,\n\x06header\x18\x01 \x01(\x0b\x32\x1c.tfedlrn_proto.MessageHeader\x12(\n\x05model\x18\x02 \x01(\x0b\x32\x19.tfedlrn_proto.ModelProto\x12\x11\n\tdata_size\x18\x03 \x01(\x05\x12\x0c\n\x04loss\x18\x04 \x01(\x02\"\x9c\x01\n\x16LocalValidationResults\x12,\n\x06header\x18\x01 \x01(\x0b\x32\x1c.tfedlrn_proto.MessageHeader\x12\x30\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x1a.tfedlrn_proto.ModelHeader\x12\x0f\n\x07results\x18\x03 \x01(\x02\x12\x11\n\tdata_size\x18\x04 \x01(\x05\"l\n\nJobRequest\x12,\n\x06header\x18\x01 \x01(\x0b\x32\x1c.tfedlrn_proto.MessageHeader\x12\x30\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x1a.tfedlrn_proto.ModelHeader\"v\n\x14ModelDownloadRequest\x12,\n\x06header\x18\x01 \x01(\x0b\x32\x1c.tfedlrn_proto.MessageHeader\x12\x30\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x1a.tfedlrn_proto.ModelHeader\"\xd2\x01\n\x0eRoundTaskQuery\x12,\n\x06header\x18\x01 \x01(\x0b\x32\x1c.tfedlrn_proto.MessageHeader\x12V\n\x16task_results_last_sync\x18\x02 \x03(\x0b\x32\x36.tfedlrn_proto.RoundTaskQuery.TaskResultsLastSyncEntry\x1a:\n\x18TaskResultsLastSyncEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\x83\x01\n\x11GlobalModelUpdate\x12,\n\x06header\x18\x01 \x01(\x0b\x32\x1c.tfedlrn_proto.MessageHeader\x12(\n\x05model\x18\x02 \x01(\x0b\x32\x19.tfedlrn_proto.ModelProto\x12\x16\n\x0eis_global_best\x18\x03 \x01(\x08\"Y\n\x08JobReply\x12,\n\x06header\x18\x01 \x01(\x0b\x32\x1c.tfedlrn_proto.MessageHeader\x12\x1f\n\x03job\x18\x02 \x01(\x0e\x32\x12.tfedlrn_proto.Job\"C\n\x13LocalModelUpdateAck\x12,\n\x06header\x18\x01 \x01(\x0b\x32\x1c.tfedlrn_proto.MessageHeader\"I\n\x19LocalValidationResultsAck\x12,\n\x06header\x18\x01 \x01(\x0b\x32\x1c.tfedlrn_proto.MessageHeader*[\n\x03Job\x12\r\n\tJOB_TRAIN\x10\x00\x12\x10\n\x0cJOB_VALIDATE\x10\x01\x12\r\n\tJOB_YIELD\x10\x02\x12\x0c\n\x08JOB_QUIT\x10\x03\x12\x16\n\x12JOB_DOWNLOAD_MODEL\x10\x04\x32\xf1\x02\n\nAggregator\x12\x42\n\nRequestJob\x12\x19.tfedlrn_proto.JobRequest\x1a\x17.tfedlrn_proto.JobReply\"\x00\x12S\n\rDownloadModel\x12#.tfedlrn_proto.ModelDownloadRequest\x1a\x19.tfedlrn_proto.DataStream\"\x00\x30\x01\x12[\n\x16UploadLocalModelUpdate\x12\x19.tfedlrn_proto.DataStream\x1a\".tfedlrn_proto.LocalModelUpdateAck\"\x00(\x01\x12m\n\x18UploadLocalMetricsUpdate\x12%.tfedlrn_proto.LocalValidationResults\x1a(.tfedlrn_proto.LocalValidationResultsAck\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\'collaborator_aggregator_interface.proto\x12\x0copenfl_proto\"+\n\nDataStream\x12\x0c\n\x04size\x18\x01 \x01(\r\x12\x0f\n\x07npbytes\x18\x02 \x01(\x0c\"\xaa\x01\n\rMetadataProto\x12\x41\n\x0cint_to_float\x18\x01 \x03(\x0b\x32+.openfl_proto.MetadataProto.IntToFloatEntry\x12\x10\n\x08int_list\x18\x02 \x03(\x05\x12\x11\n\tbool_list\x18\x03 \x03(\x08\x1a\x31\n\x0fIntToFloatEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\x02:\x02\x38\x01\"j\n\x0bTensorProto\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x12\n\ndata_bytes\x18\x03 \x01(\x0c\x12\x39\n\x14transformer_metadata\x18\x04 \x03(\x0b\x32\x1b.openfl_proto.MetadataProto\"\x7f\n\rMessageHeader\x12\x0e\n\x06sender\x18\x01 \x01(\t\x12\x11\n\trecipient\x18\x02 \x01(\t\x12\x15\n\rfederation_id\x18\x03 \x01(\t\x12\x0f\n\x07\x63ounter\x18\x04 \x01(\x05\x12#\n\x1bsingle_col_cert_common_name\x18\x05 \x01(\t\"X\n\x0bModelHeader\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08is_delta\x18\x02 \x01(\x08\x12\x1a\n\x12\x64\x65lta_from_version\x18\x03 \x01(\x05\x12\x0f\n\x07version\x18\x04 \x01(\x05\"c\n\nModelProto\x12)\n\x06header\x18\x01 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\x12*\n\x07tensors\x18\x02 \x03(\x0b\x32\x19.openfl_proto.TensorProto\"\x89\x01\n\x10LocalModelUpdate\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12\'\n\x05model\x18\x02 \x01(\x0b\x32\x18.openfl_proto.ModelProto\x12\x11\n\tdata_size\x18\x03 \x01(\x05\x12\x0c\n\x04loss\x18\x04 \x01(\x02\"\x9a\x01\n\x16LocalValidationResults\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12/\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\x12\x0f\n\x07results\x18\x03 \x01(\x02\x12\x11\n\tdata_size\x18\x04 \x01(\x05\"j\n\nJobRequest\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12/\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\"t\n\x14ModelDownloadRequest\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12/\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\"\xd0\x01\n\x0eRoundTaskQuery\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12U\n\x16task_results_last_sync\x18\x02 \x03(\x0b\x32\x35.openfl_proto.RoundTaskQuery.TaskResultsLastSyncEntry\x1a:\n\x18TaskResultsLastSyncEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\x81\x01\n\x11GlobalModelUpdate\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12\'\n\x05model\x18\x02 \x01(\x0b\x32\x18.openfl_proto.ModelProto\x12\x16\n\x0eis_global_best\x18\x03 \x01(\x08\"W\n\x08JobReply\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12\x1e\n\x03job\x18\x02 \x01(\x0e\x32\x11.openfl_proto.Job\"B\n\x13LocalModelUpdateAck\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\"H\n\x19LocalValidationResultsAck\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader*[\n\x03Job\x12\r\n\tJOB_TRAIN\x10\x00\x12\x10\n\x0cJOB_VALIDATE\x10\x01\x12\r\n\tJOB_YIELD\x10\x02\x12\x0c\n\x08JOB_QUIT\x10\x03\x12\x16\n\x12JOB_DOWNLOAD_MODEL\x10\x04\x32\xe9\x02\n\nAggregator\x12@\n\nRequestJob\x12\x18.openfl_proto.JobRequest\x1a\x16.openfl_proto.JobReply\"\x00\x12Q\n\rDownloadModel\x12\".openfl_proto.ModelDownloadRequest\x1a\x18.openfl_proto.DataStream\"\x00\x30\x01\x12Y\n\x16UploadLocalModelUpdate\x12\x18.openfl_proto.DataStream\x1a!.openfl_proto.LocalModelUpdateAck\"\x00(\x01\x12k\n\x18UploadLocalMetricsUpdate\x12$.openfl_proto.LocalValidationResults\x1a\'.openfl_proto.LocalValidationResultsAck\"\x00\x62\x06proto3'
 )
 
 _JOB = _descriptor.EnumDescriptor(
   name='Job',
-  full_name='tfedlrn_proto.Job',
+  full_name='openfl_proto.Job',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -51,8 +51,8 @@ _JOB = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1821,
-  serialized_end=1912,
+  serialized_start=1800,
+  serialized_end=1891,
 )
 _sym_db.RegisterEnumDescriptor(_JOB)
 
@@ -67,20 +67,20 @@ JOB_DOWNLOAD_MODEL = 4
 
 _DATASTREAM = _descriptor.Descriptor(
   name='DataStream',
-  full_name='tfedlrn_proto.DataStream',
+  full_name='openfl_proto.DataStream',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='size', full_name='tfedlrn_proto.DataStream.size', index=0,
+      name='size', full_name='openfl_proto.DataStream.size', index=0,
       number=1, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='npbytes', full_name='tfedlrn_proto.DataStream.npbytes', index=1,
+      name='npbytes', full_name='openfl_proto.DataStream.npbytes', index=1,
       number=2, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
@@ -98,27 +98,27 @@ _DATASTREAM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=58,
-  serialized_end=101,
+  serialized_start=57,
+  serialized_end=100,
 )
 
 
 _METADATAPROTO_INTTOFLOATENTRY = _descriptor.Descriptor(
   name='IntToFloatEntry',
-  full_name='tfedlrn_proto.MetadataProto.IntToFloatEntry',
+  full_name='openfl_proto.MetadataProto.IntToFloatEntry',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='key', full_name='tfedlrn_proto.MetadataProto.IntToFloatEntry.key', index=0,
+      name='key', full_name='openfl_proto.MetadataProto.IntToFloatEntry.key', index=0,
       number=1, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='value', full_name='tfedlrn_proto.MetadataProto.IntToFloatEntry.value', index=1,
+      name='value', full_name='openfl_proto.MetadataProto.IntToFloatEntry.value', index=1,
       number=2, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -136,33 +136,33 @@ _METADATAPROTO_INTTOFLOATENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=226,
-  serialized_end=275,
+  serialized_start=224,
+  serialized_end=273,
 )
 
 _METADATAPROTO = _descriptor.Descriptor(
   name='MetadataProto',
-  full_name='tfedlrn_proto.MetadataProto',
+  full_name='openfl_proto.MetadataProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='int_to_float', full_name='tfedlrn_proto.MetadataProto.int_to_float', index=0,
+      name='int_to_float', full_name='openfl_proto.MetadataProto.int_to_float', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='int_list', full_name='tfedlrn_proto.MetadataProto.int_list', index=1,
+      name='int_list', full_name='openfl_proto.MetadataProto.int_list', index=1,
       number=2, type=5, cpp_type=1, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='bool_list', full_name='tfedlrn_proto.MetadataProto.bool_list', index=2,
+      name='bool_list', full_name='openfl_proto.MetadataProto.bool_list', index=2,
       number=3, type=8, cpp_type=7, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -180,34 +180,34 @@ _METADATAPROTO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=104,
-  serialized_end=275,
+  serialized_start=103,
+  serialized_end=273,
 )
 
 
 _TENSORPROTO = _descriptor.Descriptor(
   name='TensorProto',
-  full_name='tfedlrn_proto.TensorProto',
+  full_name='openfl_proto.TensorProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='name', full_name='tfedlrn_proto.TensorProto.name', index=0,
+      name='name', full_name='openfl_proto.TensorProto.name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='data_bytes', full_name='tfedlrn_proto.TensorProto.data_bytes', index=1,
+      name='data_bytes', full_name='openfl_proto.TensorProto.data_bytes', index=1,
       number=3, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='transformer_metadata', full_name='tfedlrn_proto.TensorProto.transformer_metadata', index=2,
+      name='transformer_metadata', full_name='openfl_proto.TensorProto.transformer_metadata', index=2,
       number=4, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -225,48 +225,48 @@ _TENSORPROTO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=277,
-  serialized_end=384,
+  serialized_start=275,
+  serialized_end=381,
 )
 
 
 _MESSAGEHEADER = _descriptor.Descriptor(
   name='MessageHeader',
-  full_name='tfedlrn_proto.MessageHeader',
+  full_name='openfl_proto.MessageHeader',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='sender', full_name='tfedlrn_proto.MessageHeader.sender', index=0,
+      name='sender', full_name='openfl_proto.MessageHeader.sender', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='recipient', full_name='tfedlrn_proto.MessageHeader.recipient', index=1,
+      name='recipient', full_name='openfl_proto.MessageHeader.recipient', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='federation_id', full_name='tfedlrn_proto.MessageHeader.federation_id', index=2,
+      name='federation_id', full_name='openfl_proto.MessageHeader.federation_id', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='counter', full_name='tfedlrn_proto.MessageHeader.counter', index=3,
+      name='counter', full_name='openfl_proto.MessageHeader.counter', index=3,
       number=4, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='single_col_cert_common_name', full_name='tfedlrn_proto.MessageHeader.single_col_cert_common_name', index=4,
+      name='single_col_cert_common_name', full_name='openfl_proto.MessageHeader.single_col_cert_common_name', index=4,
       number=5, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -284,41 +284,41 @@ _MESSAGEHEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=386,
-  serialized_end=513,
+  serialized_start=383,
+  serialized_end=510,
 )
 
 
 _MODELHEADER = _descriptor.Descriptor(
   name='ModelHeader',
-  full_name='tfedlrn_proto.ModelHeader',
+  full_name='openfl_proto.ModelHeader',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='id', full_name='tfedlrn_proto.ModelHeader.id', index=0,
+      name='id', full_name='openfl_proto.ModelHeader.id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='is_delta', full_name='tfedlrn_proto.ModelHeader.is_delta', index=1,
+      name='is_delta', full_name='openfl_proto.ModelHeader.is_delta', index=1,
       number=2, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='delta_from_version', full_name='tfedlrn_proto.ModelHeader.delta_from_version', index=2,
+      name='delta_from_version', full_name='openfl_proto.ModelHeader.delta_from_version', index=2,
       number=3, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='version', full_name='tfedlrn_proto.ModelHeader.version', index=3,
+      name='version', full_name='openfl_proto.ModelHeader.version', index=3,
       number=4, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -336,27 +336,27 @@ _MODELHEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=515,
-  serialized_end=603,
+  serialized_start=512,
+  serialized_end=600,
 )
 
 
 _MODELPROTO = _descriptor.Descriptor(
   name='ModelProto',
-  full_name='tfedlrn_proto.ModelProto',
+  full_name='openfl_proto.ModelProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='header', full_name='tfedlrn_proto.ModelProto.header', index=0,
+      name='header', full_name='openfl_proto.ModelProto.header', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='tensors', full_name='tfedlrn_proto.ModelProto.tensors', index=1,
+      name='tensors', full_name='openfl_proto.ModelProto.tensors', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -374,41 +374,41 @@ _MODELPROTO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=605,
-  serialized_end=706,
+  serialized_start=602,
+  serialized_end=701,
 )
 
 
 _LOCALMODELUPDATE = _descriptor.Descriptor(
   name='LocalModelUpdate',
-  full_name='tfedlrn_proto.LocalModelUpdate',
+  full_name='openfl_proto.LocalModelUpdate',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='header', full_name='tfedlrn_proto.LocalModelUpdate.header', index=0,
+      name='header', full_name='openfl_proto.LocalModelUpdate.header', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='model', full_name='tfedlrn_proto.LocalModelUpdate.model', index=1,
+      name='model', full_name='openfl_proto.LocalModelUpdate.model', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='data_size', full_name='tfedlrn_proto.LocalModelUpdate.data_size', index=2,
+      name='data_size', full_name='openfl_proto.LocalModelUpdate.data_size', index=2,
       number=3, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='loss', full_name='tfedlrn_proto.LocalModelUpdate.loss', index=3,
+      name='loss', full_name='openfl_proto.LocalModelUpdate.loss', index=3,
       number=4, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -426,41 +426,41 @@ _LOCALMODELUPDATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=709,
-  serialized_end=848,
+  serialized_start=704,
+  serialized_end=841,
 )
 
 
 _LOCALVALIDATIONRESULTS = _descriptor.Descriptor(
   name='LocalValidationResults',
-  full_name='tfedlrn_proto.LocalValidationResults',
+  full_name='openfl_proto.LocalValidationResults',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='header', full_name='tfedlrn_proto.LocalValidationResults.header', index=0,
+      name='header', full_name='openfl_proto.LocalValidationResults.header', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='model_header', full_name='tfedlrn_proto.LocalValidationResults.model_header', index=1,
+      name='model_header', full_name='openfl_proto.LocalValidationResults.model_header', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='results', full_name='tfedlrn_proto.LocalValidationResults.results', index=2,
+      name='results', full_name='openfl_proto.LocalValidationResults.results', index=2,
       number=3, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='data_size', full_name='tfedlrn_proto.LocalValidationResults.data_size', index=3,
+      name='data_size', full_name='openfl_proto.LocalValidationResults.data_size', index=3,
       number=4, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -478,27 +478,27 @@ _LOCALVALIDATIONRESULTS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=851,
-  serialized_end=1007,
+  serialized_start=844,
+  serialized_end=998,
 )
 
 
 _JOBREQUEST = _descriptor.Descriptor(
   name='JobRequest',
-  full_name='tfedlrn_proto.JobRequest',
+  full_name='openfl_proto.JobRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='header', full_name='tfedlrn_proto.JobRequest.header', index=0,
+      name='header', full_name='openfl_proto.JobRequest.header', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='model_header', full_name='tfedlrn_proto.JobRequest.model_header', index=1,
+      name='model_header', full_name='openfl_proto.JobRequest.model_header', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -516,27 +516,27 @@ _JOBREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1009,
-  serialized_end=1117,
+  serialized_start=1000,
+  serialized_end=1106,
 )
 
 
 _MODELDOWNLOADREQUEST = _descriptor.Descriptor(
   name='ModelDownloadRequest',
-  full_name='tfedlrn_proto.ModelDownloadRequest',
+  full_name='openfl_proto.ModelDownloadRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='header', full_name='tfedlrn_proto.ModelDownloadRequest.header', index=0,
+      name='header', full_name='openfl_proto.ModelDownloadRequest.header', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='model_header', full_name='tfedlrn_proto.ModelDownloadRequest.model_header', index=1,
+      name='model_header', full_name='openfl_proto.ModelDownloadRequest.model_header', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -554,27 +554,27 @@ _MODELDOWNLOADREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1119,
-  serialized_end=1237,
+  serialized_start=1108,
+  serialized_end=1224,
 )
 
 
 _ROUNDTASKQUERY_TASKRESULTSLASTSYNCENTRY = _descriptor.Descriptor(
   name='TaskResultsLastSyncEntry',
-  full_name='tfedlrn_proto.RoundTaskQuery.TaskResultsLastSyncEntry',
+  full_name='openfl_proto.RoundTaskQuery.TaskResultsLastSyncEntry',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='key', full_name='tfedlrn_proto.RoundTaskQuery.TaskResultsLastSyncEntry.key', index=0,
+      name='key', full_name='openfl_proto.RoundTaskQuery.TaskResultsLastSyncEntry.key', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='value', full_name='tfedlrn_proto.RoundTaskQuery.TaskResultsLastSyncEntry.value', index=1,
+      name='value', full_name='openfl_proto.RoundTaskQuery.TaskResultsLastSyncEntry.value', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -592,26 +592,26 @@ _ROUNDTASKQUERY_TASKRESULTSLASTSYNCENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1392,
-  serialized_end=1450,
+  serialized_start=1377,
+  serialized_end=1435,
 )
 
 _ROUNDTASKQUERY = _descriptor.Descriptor(
   name='RoundTaskQuery',
-  full_name='tfedlrn_proto.RoundTaskQuery',
+  full_name='openfl_proto.RoundTaskQuery',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='header', full_name='tfedlrn_proto.RoundTaskQuery.header', index=0,
+      name='header', full_name='openfl_proto.RoundTaskQuery.header', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='task_results_last_sync', full_name='tfedlrn_proto.RoundTaskQuery.task_results_last_sync', index=1,
+      name='task_results_last_sync', full_name='openfl_proto.RoundTaskQuery.task_results_last_sync', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -629,34 +629,34 @@ _ROUNDTASKQUERY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1240,
-  serialized_end=1450,
+  serialized_start=1227,
+  serialized_end=1435,
 )
 
 
 _GLOBALMODELUPDATE = _descriptor.Descriptor(
   name='GlobalModelUpdate',
-  full_name='tfedlrn_proto.GlobalModelUpdate',
+  full_name='openfl_proto.GlobalModelUpdate',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='header', full_name='tfedlrn_proto.GlobalModelUpdate.header', index=0,
+      name='header', full_name='openfl_proto.GlobalModelUpdate.header', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='model', full_name='tfedlrn_proto.GlobalModelUpdate.model', index=1,
+      name='model', full_name='openfl_proto.GlobalModelUpdate.model', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='is_global_best', full_name='tfedlrn_proto.GlobalModelUpdate.is_global_best', index=2,
+      name='is_global_best', full_name='openfl_proto.GlobalModelUpdate.is_global_best', index=2,
       number=3, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -674,27 +674,27 @@ _GLOBALMODELUPDATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1453,
-  serialized_end=1584,
+  serialized_start=1438,
+  serialized_end=1567,
 )
 
 
 _JOBREPLY = _descriptor.Descriptor(
   name='JobReply',
-  full_name='tfedlrn_proto.JobReply',
+  full_name='openfl_proto.JobReply',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='header', full_name='tfedlrn_proto.JobReply.header', index=0,
+      name='header', full_name='openfl_proto.JobReply.header', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='job', full_name='tfedlrn_proto.JobReply.job', index=1,
+      name='job', full_name='openfl_proto.JobReply.job', index=1,
       number=2, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -712,20 +712,20 @@ _JOBREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1586,
-  serialized_end=1675,
+  serialized_start=1569,
+  serialized_end=1656,
 )
 
 
 _LOCALMODELUPDATEACK = _descriptor.Descriptor(
   name='LocalModelUpdateAck',
-  full_name='tfedlrn_proto.LocalModelUpdateAck',
+  full_name='openfl_proto.LocalModelUpdateAck',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='header', full_name='tfedlrn_proto.LocalModelUpdateAck.header', index=0,
+      name='header', full_name='openfl_proto.LocalModelUpdateAck.header', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -743,20 +743,20 @@ _LOCALMODELUPDATEACK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1677,
-  serialized_end=1744,
+  serialized_start=1658,
+  serialized_end=1724,
 )
 
 
 _LOCALVALIDATIONRESULTSACK = _descriptor.Descriptor(
   name='LocalValidationResultsAck',
-  full_name='tfedlrn_proto.LocalValidationResultsAck',
+  full_name='openfl_proto.LocalValidationResultsAck',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='header', full_name='tfedlrn_proto.LocalValidationResultsAck.header', index=0,
+      name='header', full_name='openfl_proto.LocalValidationResultsAck.header', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -774,8 +774,8 @@ _LOCALVALIDATIONRESULTSACK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1746,
-  serialized_end=1819,
+  serialized_start=1726,
+  serialized_end=1798,
 )
 
 _METADATAPROTO_INTTOFLOATENTRY.containing_type = _METADATAPROTO
@@ -821,7 +821,7 @@ _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 DataStream = _reflection.GeneratedProtocolMessageType('DataStream', (_message.Message,), {
   'DESCRIPTOR' : _DATASTREAM,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.DataStream)
+  # @@protoc_insertion_point(class_scope:openfl_proto.DataStream)
   })
 _sym_db.RegisterMessage(DataStream)
 
@@ -830,12 +830,12 @@ MetadataProto = _reflection.GeneratedProtocolMessageType('MetadataProto', (_mess
   'IntToFloatEntry' : _reflection.GeneratedProtocolMessageType('IntToFloatEntry', (_message.Message,), {
     'DESCRIPTOR' : _METADATAPROTO_INTTOFLOATENTRY,
     '__module__' : 'collaborator_aggregator_interface_pb2'
-    # @@protoc_insertion_point(class_scope:tfedlrn_proto.MetadataProto.IntToFloatEntry)
+    # @@protoc_insertion_point(class_scope:openfl_proto.MetadataProto.IntToFloatEntry)
     })
   ,
   'DESCRIPTOR' : _METADATAPROTO,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.MetadataProto)
+  # @@protoc_insertion_point(class_scope:openfl_proto.MetadataProto)
   })
 _sym_db.RegisterMessage(MetadataProto)
 _sym_db.RegisterMessage(MetadataProto.IntToFloatEntry)
@@ -843,56 +843,56 @@ _sym_db.RegisterMessage(MetadataProto.IntToFloatEntry)
 TensorProto = _reflection.GeneratedProtocolMessageType('TensorProto', (_message.Message,), {
   'DESCRIPTOR' : _TENSORPROTO,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.TensorProto)
+  # @@protoc_insertion_point(class_scope:openfl_proto.TensorProto)
   })
 _sym_db.RegisterMessage(TensorProto)
 
 MessageHeader = _reflection.GeneratedProtocolMessageType('MessageHeader', (_message.Message,), {
   'DESCRIPTOR' : _MESSAGEHEADER,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.MessageHeader)
+  # @@protoc_insertion_point(class_scope:openfl_proto.MessageHeader)
   })
 _sym_db.RegisterMessage(MessageHeader)
 
 ModelHeader = _reflection.GeneratedProtocolMessageType('ModelHeader', (_message.Message,), {
   'DESCRIPTOR' : _MODELHEADER,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.ModelHeader)
+  # @@protoc_insertion_point(class_scope:openfl_proto.ModelHeader)
   })
 _sym_db.RegisterMessage(ModelHeader)
 
 ModelProto = _reflection.GeneratedProtocolMessageType('ModelProto', (_message.Message,), {
   'DESCRIPTOR' : _MODELPROTO,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.ModelProto)
+  # @@protoc_insertion_point(class_scope:openfl_proto.ModelProto)
   })
 _sym_db.RegisterMessage(ModelProto)
 
 LocalModelUpdate = _reflection.GeneratedProtocolMessageType('LocalModelUpdate', (_message.Message,), {
   'DESCRIPTOR' : _LOCALMODELUPDATE,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.LocalModelUpdate)
+  # @@protoc_insertion_point(class_scope:openfl_proto.LocalModelUpdate)
   })
 _sym_db.RegisterMessage(LocalModelUpdate)
 
 LocalValidationResults = _reflection.GeneratedProtocolMessageType('LocalValidationResults', (_message.Message,), {
   'DESCRIPTOR' : _LOCALVALIDATIONRESULTS,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.LocalValidationResults)
+  # @@protoc_insertion_point(class_scope:openfl_proto.LocalValidationResults)
   })
 _sym_db.RegisterMessage(LocalValidationResults)
 
 JobRequest = _reflection.GeneratedProtocolMessageType('JobRequest', (_message.Message,), {
   'DESCRIPTOR' : _JOBREQUEST,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.JobRequest)
+  # @@protoc_insertion_point(class_scope:openfl_proto.JobRequest)
   })
 _sym_db.RegisterMessage(JobRequest)
 
 ModelDownloadRequest = _reflection.GeneratedProtocolMessageType('ModelDownloadRequest', (_message.Message,), {
   'DESCRIPTOR' : _MODELDOWNLOADREQUEST,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.ModelDownloadRequest)
+  # @@protoc_insertion_point(class_scope:openfl_proto.ModelDownloadRequest)
   })
 _sym_db.RegisterMessage(ModelDownloadRequest)
 
@@ -901,12 +901,12 @@ RoundTaskQuery = _reflection.GeneratedProtocolMessageType('RoundTaskQuery', (_me
   'TaskResultsLastSyncEntry' : _reflection.GeneratedProtocolMessageType('TaskResultsLastSyncEntry', (_message.Message,), {
     'DESCRIPTOR' : _ROUNDTASKQUERY_TASKRESULTSLASTSYNCENTRY,
     '__module__' : 'collaborator_aggregator_interface_pb2'
-    # @@protoc_insertion_point(class_scope:tfedlrn_proto.RoundTaskQuery.TaskResultsLastSyncEntry)
+    # @@protoc_insertion_point(class_scope:openfl_proto.RoundTaskQuery.TaskResultsLastSyncEntry)
     })
   ,
   'DESCRIPTOR' : _ROUNDTASKQUERY,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.RoundTaskQuery)
+  # @@protoc_insertion_point(class_scope:openfl_proto.RoundTaskQuery)
   })
 _sym_db.RegisterMessage(RoundTaskQuery)
 _sym_db.RegisterMessage(RoundTaskQuery.TaskResultsLastSyncEntry)
@@ -914,28 +914,28 @@ _sym_db.RegisterMessage(RoundTaskQuery.TaskResultsLastSyncEntry)
 GlobalModelUpdate = _reflection.GeneratedProtocolMessageType('GlobalModelUpdate', (_message.Message,), {
   'DESCRIPTOR' : _GLOBALMODELUPDATE,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.GlobalModelUpdate)
+  # @@protoc_insertion_point(class_scope:openfl_proto.GlobalModelUpdate)
   })
 _sym_db.RegisterMessage(GlobalModelUpdate)
 
 JobReply = _reflection.GeneratedProtocolMessageType('JobReply', (_message.Message,), {
   'DESCRIPTOR' : _JOBREPLY,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.JobReply)
+  # @@protoc_insertion_point(class_scope:openfl_proto.JobReply)
   })
 _sym_db.RegisterMessage(JobReply)
 
 LocalModelUpdateAck = _reflection.GeneratedProtocolMessageType('LocalModelUpdateAck', (_message.Message,), {
   'DESCRIPTOR' : _LOCALMODELUPDATEACK,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.LocalModelUpdateAck)
+  # @@protoc_insertion_point(class_scope:openfl_proto.LocalModelUpdateAck)
   })
 _sym_db.RegisterMessage(LocalModelUpdateAck)
 
 LocalValidationResultsAck = _reflection.GeneratedProtocolMessageType('LocalValidationResultsAck', (_message.Message,), {
   'DESCRIPTOR' : _LOCALVALIDATIONRESULTSACK,
   '__module__' : 'collaborator_aggregator_interface_pb2'
-  # @@protoc_insertion_point(class_scope:tfedlrn_proto.LocalValidationResultsAck)
+  # @@protoc_insertion_point(class_scope:openfl_proto.LocalValidationResultsAck)
   })
 _sym_db.RegisterMessage(LocalValidationResultsAck)
 
@@ -945,16 +945,16 @@ _ROUNDTASKQUERY_TASKRESULTSLASTSYNCENTRY._options = None
 
 _AGGREGATOR = _descriptor.ServiceDescriptor(
   name='Aggregator',
-  full_name='tfedlrn_proto.Aggregator',
+  full_name='openfl_proto.Aggregator',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=1915,
-  serialized_end=2284,
+  serialized_start=1894,
+  serialized_end=2255,
   methods=[
   _descriptor.MethodDescriptor(
     name='RequestJob',
-    full_name='tfedlrn_proto.Aggregator.RequestJob',
+    full_name='openfl_proto.Aggregator.RequestJob',
     index=0,
     containing_service=None,
     input_type=_JOBREQUEST,
@@ -963,7 +963,7 @@ _AGGREGATOR = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='DownloadModel',
-    full_name='tfedlrn_proto.Aggregator.DownloadModel',
+    full_name='openfl_proto.Aggregator.DownloadModel',
     index=1,
     containing_service=None,
     input_type=_MODELDOWNLOADREQUEST,
@@ -972,7 +972,7 @@ _AGGREGATOR = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='UploadLocalModelUpdate',
-    full_name='tfedlrn_proto.Aggregator.UploadLocalModelUpdate',
+    full_name='openfl_proto.Aggregator.UploadLocalModelUpdate',
     index=2,
     containing_service=None,
     input_type=_DATASTREAM,
@@ -981,7 +981,7 @@ _AGGREGATOR = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='UploadLocalMetricsUpdate',
-    full_name='tfedlrn_proto.Aggregator.UploadLocalMetricsUpdate',
+    full_name='openfl_proto.Aggregator.UploadLocalMetricsUpdate',
     index=3,
     containing_service=None,
     input_type=_LOCALVALIDATIONRESULTS,

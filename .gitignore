@@ -11,7 +11,7 @@ build/
 logs/
 .vscode/
 venv/
-tfedlrn.egg-info/
+openfl.egg-info/
 docs/_build
 bin/out
 bin/federations/certs

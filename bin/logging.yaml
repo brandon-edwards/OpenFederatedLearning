@@ -41,11 +41,11 @@ handlers:
     encoding: utf8
 
 loggers:
-  tfedlrn.aggregator:
+  openfl.aggregator:
     level: DEBUG
     handlers: [console, agg_file_handler]
     propagate: yes
-  tfedlrn.collaborator:
+  openfl.collaborator:
     level: DEBUG
     handlers: [console, col_file_handler]
     propagate: yes

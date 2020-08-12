@@ -7,8 +7,8 @@ import argparse
 import os
 import logging
 
-from tfedlrn            import load_yaml
-from tfedlrn.flplan     import parse_fl_plan
+from openfl            import load_yaml
+from openfl.flplan     import parse_fl_plan
 from single_proc_fed    import federate
 from setup_logging      import setup_logging
 

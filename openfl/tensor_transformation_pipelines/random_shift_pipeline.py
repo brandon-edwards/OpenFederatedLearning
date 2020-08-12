@@ -1,7 +1,7 @@
 import numpy as np
 
-from tfedlrn.tensor_transformation_pipelines import TransformationPipeline, Transformer
-from tfedlrn.tensor_transformation_pipelines import Float32NumpyArrayToBytes
+from openfl.tensor_transformation_pipelines import TransformationPipeline, Transformer
+from openfl.tensor_transformation_pipelines import Float32NumpyArrayToBytes
 
 class RandomShiftTransformer(Transformer):
     """Random Shift Transformer

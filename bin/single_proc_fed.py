@@ -4,7 +4,7 @@
 from enum import Enum
 import os
 
-from tfedlrn.flplan import create_data_object, create_model_object, create_compression_pipeline, create_aggregator_object_from_flplan, create_collaborator_object_from_flplan
+from openfl.flplan import create_data_object, create_model_object, create_compression_pipeline, create_aggregator_object_from_flplan, create_collaborator_object_from_flplan
 
 
 def federate(flplan,

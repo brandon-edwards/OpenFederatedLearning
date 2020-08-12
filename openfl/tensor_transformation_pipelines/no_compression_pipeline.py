@@ -1,4 +1,4 @@
-from tfedlrn.tensor_transformation_pipelines import TransformationPipeline, Transformer
+from openfl.tensor_transformation_pipelines import TransformationPipeline, Transformer
 
 import numpy as np
 

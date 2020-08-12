@@ -6,13 +6,13 @@ import logging
 import hashlib
 import yaml
 
-from tfedlrn import load_yaml, get_object
-from tfedlrn.localconfig import get_data_path_from_local_config
-from tfedlrn.tensor_transformation_pipelines import NoCompressionPipeline
-from tfedlrn.aggregator.aggregator import Aggregator
-from tfedlrn.collaborator.collaborator import Collaborator
-from tfedlrn.comms.grpc.aggregatorgrpcserver import AggregatorGRPCServer
-from tfedlrn.comms.grpc.collaboratorgrpcclient import CollaboratorGRPCClient
+from openfl import load_yaml, get_object
+from openfl.localconfig import get_data_path_from_local_config
+from openfl.tensor_transformation_pipelines import NoCompressionPipeline
+from openfl.aggregator.aggregator import Aggregator
+from openfl.collaborator.collaborator import Collaborator
+from openfl.comms.grpc.aggregatorgrpcserver import AggregatorGRPCServer
+from openfl.comms.grpc.collaboratorgrpcclient import CollaboratorGRPCClient
 
 
 def parse_fl_plan(plan_path, logger=None):

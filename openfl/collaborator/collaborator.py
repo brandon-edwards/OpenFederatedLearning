@@ -14,8 +14,8 @@ from ..proto.collaborator_aggregator_interface_pb2 import ModelDownloadRequest, 
 from ..proto.collaborator_aggregator_interface_pb2 import LocalModelUpdate, LocalModelUpdateAck
 from ..proto.collaborator_aggregator_interface_pb2 import LocalValidationResults, LocalValidationResultsAck
 
-from tfedlrn.tensor_transformation_pipelines import NoCompressionPipeline
-from tfedlrn.proto.protoutils import construct_proto, deconstruct_proto
+from openfl.tensor_transformation_pipelines import NoCompressionPipeline
+from openfl.proto.protoutils import construct_proto, deconstruct_proto
 
 from enum import Enum
 

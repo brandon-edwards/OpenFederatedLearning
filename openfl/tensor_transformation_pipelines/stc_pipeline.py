@@ -1,7 +1,7 @@
 import numpy as np
 import gzip
 
-from tfedlrn.tensor_transformation_pipelines import TransformationPipeline, Transformer
+from openfl.tensor_transformation_pipelines import TransformationPipeline, Transformer
 
 class SparsityTransformer(Transformer):
     """A transformer class to sparsify input data.

@@ -9,8 +9,8 @@ import os
 import logging
 import importlib
 
-from tfedlrn.collaborator.collaborator import Collaborator
-from tfedlrn.flplan import create_collaborator_object_from_flplan, parse_fl_plan, load_yaml
+from openfl.collaborator.collaborator import Collaborator
+from openfl.flplan import create_collaborator_object_from_flplan, parse_fl_plan, load_yaml
 from setup_logging import setup_logging
 
 

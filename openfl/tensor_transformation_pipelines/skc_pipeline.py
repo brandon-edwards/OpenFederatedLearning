@@ -3,7 +3,7 @@ import gzip
 import copy
 from sklearn import cluster
 
-from tfedlrn.tensor_transformation_pipelines import TransformationPipeline, Transformer
+from openfl.tensor_transformation_pipelines import TransformationPipeline, Transformer
 
 class SparsityTransformer(Transformer):
     """ A transformer class to sparsify input data.

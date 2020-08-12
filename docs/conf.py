@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'FLedge'
+project = 'openfl'
 copyright = '2020, Intel'
 author = 'Secure Intelligence Team'
 master_doc = 'index'

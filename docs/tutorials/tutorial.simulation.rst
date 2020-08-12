@@ -59,15 +59,15 @@ and cd to the bin directory.
 .. code-block:: console
 
   $ pwd                                                                                                                                                                                                                            msheller@spr-gpu01
-    /home/<user>/git/tfedlrn/bin
+    /home/<user>/git/openfl/bin
   $ grep -A 2 "round results" logs/aggregator.log
-    2020-03-30 13:45:33,404 - tfedlrn.aggregator.aggregator - INFO - round results for model id/version KerasCNN/1
-    2020-03-30 13:45:33,404 - tfedlrn.aggregator.aggregator - INFO -        validation: 0.4465000107884407
-    2020-03-30 13:45:33,404 - tfedlrn.aggregator.aggregator - INFO -        loss: 1.0632034242153168
+    2020-03-30 13:45:33,404 - openfl.aggregator.aggregator - INFO - round results for model id/version KerasCNN/1
+    2020-03-30 13:45:33,404 - openfl.aggregator.aggregator - INFO -        validation: 0.4465000107884407
+    2020-03-30 13:45:33,404 - openfl.aggregator.aggregator - INFO -        loss: 1.0632034242153168
     --
-    2020-03-30 13:45:35,127 - tfedlrn.aggregator.aggregator - INFO - round results for model id/version KerasCNN/2
-    2020-03-30 13:45:35,127 - tfedlrn.aggregator.aggregator - INFO -        validation: 0.8630000054836273
-    2020-03-30 13:45:35,127 - tfedlrn.aggregator.aggregator - INFO -        loss: 0.41314733028411865
+    2020-03-30 13:45:35,127 - openfl.aggregator.aggregator - INFO - round results for model id/version KerasCNN/2
+    2020-03-30 13:45:35,127 - openfl.aggregator.aggregator - INFO -        validation: 0.8630000054836273
+    2020-03-30 13:45:35,127 - openfl.aggregator.aggregator - INFO -        loss: 0.41314733028411865
     --
 
 Note that aggregator.log is always appended to, so will include results from previous runs.
