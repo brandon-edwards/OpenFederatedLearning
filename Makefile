@@ -66,13 +66,11 @@ $(openfl_tensorflow_whl): $(venv) remove_build
 	rm -r -f openfl.tensorflow.egg-info
 
 $(fets_whl): $(venv)
-	cd submodules/fets_ai/Algorithms
-	rm -rf build
-	rm -rf dist
-	../../../$(venv) setup.py bdist_wheel
+	cd submodules/fets_ai/Algorithms && rm -rf build
+	cd submodules/fets_ai/Algorithms && rm -rf dist
+	cd submodules/fets_ai/Algorithms && ../../../$(venv) setup.py bdist_wheel
 	# we will use the wheel, and do not want the egg info
-	rm -r -f fets.egg-info
-	cd ../../../
+	cd submodules/fets_ai/Algorithms && rm -r -f fets.egg-info
 
 # the install recipes
 $(openfl): $(openfl_whl)
