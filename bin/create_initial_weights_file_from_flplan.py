@@ -16,7 +16,7 @@ from openfl.proto.protoutils import dump_proto, construct_proto
 from setup_logging import setup_logging
 
 
-def main(plan, native_model_weights_filepath, collaborators_file, feature_shape, data_config_fname, logging_config_path, logging_default_level):
+def main(plan, native_model_weights_filepath, collaborators_file, feature_shape, n_classes, data_config_fname, logging_config_path, logging_default_level):
     """Creates a protobuf file of the initial weights for the model
 
     Uses the federation (FL) plan to create an initial weights file
@@ -62,7 +62,7 @@ def main(plan, native_model_weights_filepath, collaborators_file, feature_shape,
         # FIXME: this will ultimately run in a governor environment and should not require any data to work
         # pick the first collaborator to create the data and model (could be any)
         collaborator_common_name = load_yaml(os.path.join(base_dir, 'collaborator_lists', collaborators_file))['collaborator_common_names'][0]
-        data = create_data_object(flplan, collaborator_common_name, local_config)
+        data = create_data_object(flplan, collaborator_common_name, local_config, n_classes=n_classes)
     else:
         data = get_object('openfl.data.dummy.randomdata', 'RandomData', feature_shape=feature_shape)
         logger.info('Using data object of type {} and feature shape {}'.format(type(data), feature_shape))
@@ -111,6 +111,7 @@ if __name__ == '__main__':
     parser.add_argument('--native_model_weights_filepath', '-nmwf', type=str, default=None)
     parser.add_argument('--collaborators_file', '-c', type=str, default=None, help="Name of YAML File in /bin/federations/collaborator_lists/")
     parser.add_argument('--feature_shape', '-fs', type=int, nargs='+', default=None)
+    parser.add_argument('--n_classes', '-nc', type=int, default=None)
     parser.add_argument('--data_config_fname', '-dc', type=str, default="local_data_config.yaml")
     parser.add_argument('--logging_config_path', '-lcp', type=str, default="logging.yaml")
     parser.add_argument('--logging_default_level', '-l', type=str, default="info")

@@ -12,7 +12,7 @@ class RandomData(FLData):
     """A helper function to create a Data object with random data.
     """
 
-    def __init__(self, feature_shape, label_shape=None, data_path=None, train_batches=1, val_batches=1, batch_size=32, **kwargs):
+    def __init__(self, feature_shape, label_shape=None, data_path=None, train_batches=1, val_batches=1, batch_size=32, n_classes=None, **kwargs):
         """The initializer method
 
         Args:
@@ -34,6 +34,7 @@ class RandomData(FLData):
         self.y_train = np.random.random(size=tuple([train_batches * batch_size] + list(label_shape))).astype(np.float32)
         self.X_val = np.random.random(size=tuple([val_batches * batch_size] + list(feature_shape))).astype(np.float32)
         self.y_val = np.random.random(size=tuple([val_batches * batch_size] + list(label_shape))).astype(np.float32)
+        self.n_classes = n_classes
 
 
     def get_feature_shape(self):
