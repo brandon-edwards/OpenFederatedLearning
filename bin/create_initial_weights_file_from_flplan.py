@@ -16,7 +16,7 @@ from openfl.proto.protoutils import dump_proto, construct_proto
 from setup_logging import setup_logging
 
 
-def main(plan, native_model_weights_filepath, collaborators_file, feature_shape, n_classes, data_config_fname, logging_config_path, logging_default_level):
+def main(plan, native_model_weights_filepath, collaborators_file, feature_shape, n_classes, data_config_fname, logging_config_path, logging_default_level, model_device):
     """Creates a protobuf file of the initial weights for the model
 
     Uses the federation (FL) plan to create an initial weights file
@@ -68,7 +68,7 @@ def main(plan, native_model_weights_filepath, collaborators_file, feature_shape,
         logger.info('Using data object of type {} and feature shape {}'.format(type(data), feature_shape))
 
     # create the model object and compression pipeline
-    wrapped_model = create_model_object(flplan, data)
+    wrapped_model = create_model_object(flplan, data, model_device=model_device)
     compression_pipeline = create_compression_pipeline(flplan)
 
     # determine if we need to store the optimizer variables
@@ -115,5 +115,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_config_fname', '-dc', type=str, default="local_data_config.yaml")
     parser.add_argument('--logging_config_path', '-lcp', type=str, default="logging.yaml")
     parser.add_argument('--logging_default_level', '-l', type=str, default="info")
+    # FIXME: this kind of commandline configuration needs to be done in a consistent way
+    parser.add_argument('--model_device', '-md', type=str, default='cpu')
     args = parser.parse_args()
     main(**vars(args))
