@@ -21,13 +21,13 @@ collaborator_object_init:
     send_model_deltas: false
 
 data_object_init:
-  class_to_init: data.tensorflow.tfmnist_inmemory.TensorFlowMNISTInMemory
+  class_to_init: openfl.data.tensorflow.tfmnist_inmemory.TensorFlowMNISTInMemory
   data_name_in_local_config: mnist_shard
   init_kwargs:
     nb_collaborators: 10
 
 model_object_init:
-  class_to_init: models.tensorflow.keras_cnn.keras_cnn.KerasCNN
+  class_to_init: openfl.models.tensorflow.keras_cnn.keras_cnn.KerasCNN
 
 network_object_init:
   defaults_file: defaults/network.yaml

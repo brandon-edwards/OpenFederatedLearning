@@ -21,14 +21,14 @@ collaborator_object_init:
     send_model_deltas: false
 
 data_object_init:
-  class_to_init: data.tensorflow.tfbrats_inmemory.TensorFlowBratsInMemory
+  class_to_init: openfl.data.tensorflow.tfbrats_inmemory.TensorFlowBratsInMemory
   data_name_in_local_config: brats
   init_kwargs:
     batch_size: 64
     percent_train: 0.8
 
 model_object_init:
-  class_to_init: models.tensorflow.tf_2dunet.tf_2dunet.TensorFlow2DUNet.TensorFlow2DUNet
+  class_to_init: openfl.models.tensorflow.tf_2dunet.tf_2dunet.TensorFlow2DUNet.TensorFlow2DUNet
 
 network_object_init:
   defaults_file: defaults/network.yaml

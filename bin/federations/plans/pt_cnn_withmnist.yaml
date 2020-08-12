@@ -21,7 +21,7 @@ collaborator_object_init:
     send_model_deltas: false
 
 data_object_init:
-  class_to_init: data.pytorch.ptmnist_inmemory.PyTorchMNISTInMemory
+  class_to_init: openfl.data.pytorch.ptmnist_inmemory.PyTorchMNISTInMemory
   data_name_in_local_config: mnist_shard
   init_kwargs:
     batch_size: 256
@@ -29,7 +29,7 @@ data_object_init:
     nb_collaborators: 10
 
 model_object_init:
-  class_to_init: models.pytorch.pt_cnn.pt_cnn.PyTorchCNN
+  class_to_init: openfl.models.pytorch.pt_cnn.pt_cnn.PyTorchCNN
 
 network_object_init:
   defaults_file: defaults/network.yaml

@@ -21,7 +21,7 @@ collaborator_object_init:
     send_model_deltas: false
 
 data_object_init:
-  class_to_init: data.pytorch.ptcifar10_inmemory.PyTorchCIFAR10InMemory
+  class_to_init: openfl.data.pytorch.ptcifar10_inmemory.PyTorchCIFAR10InMemory
   data_name_in_local_config: cifar10_shard
   init_kwargs:
     batch_size: 256
@@ -29,7 +29,7 @@ data_object_init:
     nb_collaborators: 10
 
 model_object_init:
-  class_to_init: models.pytorch.pt_resnet.pt_resnet.PyTorchResnet
+  class_to_init: openfl.models.pytorch.pt_resnet.pt_resnet.PyTorchResnet
 
 network_object_init:
   defaults_file: defaults/network.yaml

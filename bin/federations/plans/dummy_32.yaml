@@ -21,7 +21,7 @@ collaborator_object_init:
     send_model_deltas: false
 
 data_object_init:
-  class_to_init: data.dummy.emptydata.EmptyData
+  class_to_init: openfl.data.dummy.emptydata.EmptyData
   data_name_in_local_config: mnist_shard
   init_kwargs:
     data_size_mean: 100
@@ -29,7 +29,7 @@ data_object_init:
     p_train: 0.8
 
 model_object_init:
-  class_to_init: models.dummy.dummymodel.DummyModel
+  class_to_init: openfl.models.dummy.dummymodel.DummyModel
   init_kwargs:
     layer_shapes:
       layer_1:
