@@ -28,6 +28,5 @@ setup(name='openfl',
                 'openfl.data.tensorflow',
                 ],
       install_requires=['protobuf', 'pyyaml', 'grpcio', 'tqdm', 'coloredlogs', 
-                        'tensorboardX', 'nibabel', 'sklearn', 'torch==1.6.0',
-                        'coloredlogs', 'SimpleITK', 'pandas']
+                        'sklearn', 'coloredlogs', 'SimpleITK', 'pandas']
 )

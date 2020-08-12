@@ -27,5 +27,5 @@ setup(name='openfl.pytorch',
                 'openfl.models.tensorflow.tf_2dunet',
                 'openfl.data.tensorflow',
                 ],
-      install_requires=['torch==1.6.0', 'openfl']
+      install_requires=['openfl']
 )

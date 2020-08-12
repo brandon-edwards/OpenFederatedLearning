@@ -26,11 +26,13 @@ venv = venv/bin/$(python_version)
 openfl				= venv/lib/$(python_version)/site-packages/openfl
 openfl_pytorch 		= venv/lib/$(python_version)/site-packages/openfl/models/pytorch
 openfl_tensorflow 	= venv/lib/$(python_version)/site-packages/openfl/models/tensorflow
+fets		 		= venv/lib/$(python_version)/site-packages/fets
 
 # the wheel files for the packages
 openfl_whl 				= dist/openfl-0.0.0-py3-none-any.whl
 openfl_pytorch_whl 		= dist/openfl.pytorch-0.0.0-py3-none-any.whl
 openfl_tensorflow_whl 	= dist/openfl.tensorflow-0.0.0-py3-none-any.whl
+fets_whl				= submodules/fets_ai/Algorithms/dist/fets-0.0.0-py3-none-any.whl
 
 # the python virtual env recipe
 $(venv):
@@ -63,6 +65,15 @@ $(openfl_tensorflow_whl): $(venv) remove_build
 	# we will use the wheel, and do not want the egg info
 	rm -r -f openfl.tensorflow.egg-info
 
+$(fets_whl): $(venv)
+	cd submodules/fets_ai/Algorithms
+	rm -rf build
+	rm -rf dist
+	../../../$(venv) setup.py bdist_wheel
+	# we will use the wheel, and do not want the egg info
+	rm -r -f fets.egg-info
+	cd ../../../
+
 # the install recipes
 $(openfl): $(openfl_whl)
 	venv/bin/pip install $(openfl_whl)
@@ -70,23 +81,28 @@ $(openfl): $(openfl_whl)
 $(openfl_pytorch): $(openfl_pytorch_whl)
 	venv/bin/pip install $(openfl_pytorch_whl)
 
-$(openfl_tensorflow): $(openfl_tensorflow_whl)
+$(openfl_tensorflow): $(openfl_tensorflow_whl) 
 	venv/bin/pip install $(openfl_tensorflow_whl)
+
+$(fets): $(fets_whl)
+	venv/bin/pip install $(fets_whl)
 
 install_openfl: $(openfl)
 
-install_openfl_pytorch: $(openfl_pytorch)
+install_openfl_pytorch: $(openfl_pytorch) $(openfl)
 
-install_openfl_tensorflow: $(openfl_tensorflow)
+install_openfl_tensorflow: $(openfl_tensorflow) $(openfl)
 
-install: install_openfl install_openfl_pytorch install_openfl_tensorflow
+install_fets: $(fets) $(openfl_pytorch)
+
+install: install_openfl install_openfl_pytorch install_openfl_tensorflow install_fets
 
 # the uninstall recipes
 remove_build:
 	rm -rf build
 	rm -rf dist
 
-uninstall: uninstall_openfl uninstall_openfl_pytorch uninstall_openfl_tensorflow
+uninstall: uninstall_openfl uninstall_openfl_pytorch uninstall_openfl_tensorflow uninstall_fets
 
 uninstall_openfl: remove_build
 	venv/bin/pip uninstall -y openfl
@@ -96,6 +112,11 @@ uninstall_openfl_pytorch: remove_build
 
 uninstall_openfl_tensorflow: remove_build
 	venv/bin/pip uninstall -y openfl.tensorflow
+	
+uninstall_fets:
+	rm -rf submodules/fets_ai/Algorithms/build
+	rm -rf submodules/fets_ai/Algorithms/dist
+	venv/bin/pip uninstall -y fets
 
 # the reinstall recipe does everything by default
 reinstall: uninstall install
