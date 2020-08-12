@@ -124,3 +124,5 @@ clean:
 	rm -r -f venv
 	rm -r -f dist
 	rm -r -f build
+	rm -rf submodules/fets_ai/Algorithms/build
+	rm -rf submodules/fets_ai/Algorithms/dist
