@@ -64,7 +64,7 @@ def main(plan, native_model_weights_filepath, collaborators_file, feature_shape,
         collaborator_common_name = load_yaml(os.path.join(base_dir, 'collaborator_lists', collaborators_file))['collaborator_common_names'][0]
         data = create_data_object(flplan, collaborator_common_name, local_config)
     else:
-        data = get_object('data.dummy.randomdata', 'RandomData', feature_shape=feature_shape)
+        data = get_object('openfl.data.dummy.randomdata', 'RandomData', feature_shape=feature_shape)
         logger.info('Using data object of type {} and feature shape {}'.format(type(data), feature_shape))
 
     # create the model object and compression pipeline
