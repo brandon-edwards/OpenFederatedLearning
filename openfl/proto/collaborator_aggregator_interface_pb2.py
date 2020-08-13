@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='openfl_proto',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\'collaborator_aggregator_interface.proto\x12\x0copenfl_proto\"+\n\nDataStream\x12\x0c\n\x04size\x18\x01 \x01(\r\x12\x0f\n\x07npbytes\x18\x02 \x01(\x0c\"\xaa\x01\n\rMetadataProto\x12\x41\n\x0cint_to_float\x18\x01 \x03(\x0b\x32+.openfl_proto.MetadataProto.IntToFloatEntry\x12\x10\n\x08int_list\x18\x02 \x03(\x05\x12\x11\n\tbool_list\x18\x03 \x03(\x08\x1a\x31\n\x0fIntToFloatEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\x02:\x02\x38\x01\"j\n\x0bTensorProto\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x12\n\ndata_bytes\x18\x03 \x01(\x0c\x12\x39\n\x14transformer_metadata\x18\x04 \x03(\x0b\x32\x1b.openfl_proto.MetadataProto\"\x7f\n\rMessageHeader\x12\x0e\n\x06sender\x18\x01 \x01(\t\x12\x11\n\trecipient\x18\x02 \x01(\t\x12\x15\n\rfederation_id\x18\x03 \x01(\t\x12\x0f\n\x07\x63ounter\x18\x04 \x01(\x05\x12#\n\x1bsingle_col_cert_common_name\x18\x05 \x01(\t\"X\n\x0bModelHeader\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08is_delta\x18\x02 \x01(\x08\x12\x1a\n\x12\x64\x65lta_from_version\x18\x03 \x01(\x05\x12\x0f\n\x07version\x18\x04 \x01(\x05\"c\n\nModelProto\x12)\n\x06header\x18\x01 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\x12*\n\x07tensors\x18\x02 \x03(\x0b\x32\x19.openfl_proto.TensorProto\"\x89\x01\n\x10LocalModelUpdate\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12\'\n\x05model\x18\x02 \x01(\x0b\x32\x18.openfl_proto.ModelProto\x12\x11\n\tdata_size\x18\x03 \x01(\x05\x12\x0c\n\x04loss\x18\x04 \x01(\x02\"\x9a\x01\n\x16LocalValidationResults\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12/\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\x12\x0f\n\x07results\x18\x03 \x01(\x02\x12\x11\n\tdata_size\x18\x04 \x01(\x05\"j\n\nJobRequest\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12/\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\"t\n\x14ModelDownloadRequest\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12/\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\"\xd0\x01\n\x0eRoundTaskQuery\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12U\n\x16task_results_last_sync\x18\x02 \x03(\x0b\x32\x35.openfl_proto.RoundTaskQuery.TaskResultsLastSyncEntry\x1a:\n\x18TaskResultsLastSyncEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\x81\x01\n\x11GlobalModelUpdate\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12\'\n\x05model\x18\x02 \x01(\x0b\x32\x18.openfl_proto.ModelProto\x12\x16\n\x0eis_global_best\x18\x03 \x01(\x08\"W\n\x08JobReply\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12\x1e\n\x03job\x18\x02 \x01(\x0e\x32\x11.openfl_proto.Job\"B\n\x13LocalModelUpdateAck\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\"H\n\x19LocalValidationResultsAck\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader*[\n\x03Job\x12\r\n\tJOB_TRAIN\x10\x00\x12\x10\n\x0cJOB_VALIDATE\x10\x01\x12\r\n\tJOB_YIELD\x10\x02\x12\x0c\n\x08JOB_QUIT\x10\x03\x12\x16\n\x12JOB_DOWNLOAD_MODEL\x10\x04\x32\xe9\x02\n\nAggregator\x12@\n\nRequestJob\x12\x18.openfl_proto.JobRequest\x1a\x16.openfl_proto.JobReply\"\x00\x12Q\n\rDownloadModel\x12\".openfl_proto.ModelDownloadRequest\x1a\x18.openfl_proto.DataStream\"\x00\x30\x01\x12Y\n\x16UploadLocalModelUpdate\x12\x18.openfl_proto.DataStream\x1a!.openfl_proto.LocalModelUpdateAck\"\x00(\x01\x12k\n\x18UploadLocalMetricsUpdate\x12$.openfl_proto.LocalValidationResults\x1a\'.openfl_proto.LocalValidationResultsAck\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\'collaborator_aggregator_interface.proto\x12\x0copenfl_proto\"+\n\nDataStream\x12\x0c\n\x04size\x18\x01 \x01(\r\x12\x0f\n\x07npbytes\x18\x02 \x01(\x0c\"\xaa\x01\n\rMetadataProto\x12\x41\n\x0cint_to_float\x18\x01 \x03(\x0b\x32+.openfl_proto.MetadataProto.IntToFloatEntry\x12\x10\n\x08int_list\x18\x02 \x03(\x05\x12\x11\n\tbool_list\x18\x03 \x03(\x08\x1a\x31\n\x0fIntToFloatEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\x02:\x02\x38\x01\"j\n\x0bTensorProto\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x12\n\ndata_bytes\x18\x03 \x01(\x0c\x12\x39\n\x14transformer_metadata\x18\x04 \x03(\x0b\x32\x1b.openfl_proto.MetadataProto\"\x7f\n\rMessageHeader\x12\x0e\n\x06sender\x18\x01 \x01(\t\x12\x11\n\trecipient\x18\x02 \x01(\t\x12\x15\n\rfederation_id\x18\x03 \x01(\t\x12\x0f\n\x07\x63ounter\x18\x04 \x01(\x05\x12#\n\x1bsingle_col_cert_common_name\x18\x05 \x01(\t\"X\n\x0bModelHeader\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08is_delta\x18\x02 \x01(\x08\x12\x1a\n\x12\x64\x65lta_from_version\x18\x03 \x01(\x05\x12\x0f\n\x07version\x18\x04 \x01(\x05\"c\n\nModelProto\x12)\n\x06header\x18\x01 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\x12*\n\x07tensors\x18\x02 \x03(\x0b\x32\x19.openfl_proto.TensorProto\"\x89\x01\n\x10LocalModelUpdate\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12\'\n\x05model\x18\x02 \x01(\x0b\x32\x18.openfl_proto.ModelProto\x12\x11\n\tdata_size\x18\x03 \x01(\x05\x12\x0c\n\x04loss\x18\x04 \x01(\x02\"\x9a\x01\n\x16LocalValidationResults\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12/\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\x12\x0f\n\x07results\x18\x03 \x01(\x02\x12\x11\n\tdata_size\x18\x04 \x01(\x05\"j\n\nJobRequest\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12/\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\"t\n\x14ModelDownloadRequest\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12/\n\x0cmodel_header\x18\x02 \x01(\x0b\x32\x19.openfl_proto.ModelHeader\"\xd0\x01\n\x0eRoundTaskQuery\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12U\n\x16task_results_last_sync\x18\x02 \x03(\x0b\x32\x35.openfl_proto.RoundTaskQuery.TaskResultsLastSyncEntry\x1a:\n\x18TaskResultsLastSyncEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\x98\x01\n\x11GlobalModelUpdate\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12\'\n\x05model\x18\x02 \x01(\x0b\x32\x18.openfl_proto.ModelProto\x12\x16\n\x0eis_global_best\x18\x03 \x01(\x08\x12\x15\n\rmetadata_yaml\x18\x04 \x01(\t\"W\n\x08JobReply\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\x12\x1e\n\x03job\x18\x02 \x01(\x0e\x32\x11.openfl_proto.Job\"B\n\x13LocalModelUpdateAck\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader\"H\n\x19LocalValidationResultsAck\x12+\n\x06header\x18\x01 \x01(\x0b\x32\x1b.openfl_proto.MessageHeader*[\n\x03Job\x12\r\n\tJOB_TRAIN\x10\x00\x12\x10\n\x0cJOB_VALIDATE\x10\x01\x12\r\n\tJOB_YIELD\x10\x02\x12\x0c\n\x08JOB_QUIT\x10\x03\x12\x16\n\x12JOB_DOWNLOAD_MODEL\x10\x04\x32\xe9\x02\n\nAggregator\x12@\n\nRequestJob\x12\x18.openfl_proto.JobRequest\x1a\x16.openfl_proto.JobReply\"\x00\x12Q\n\rDownloadModel\x12\".openfl_proto.ModelDownloadRequest\x1a\x18.openfl_proto.DataStream\"\x00\x30\x01\x12Y\n\x16UploadLocalModelUpdate\x12\x18.openfl_proto.DataStream\x1a!.openfl_proto.LocalModelUpdateAck\"\x00(\x01\x12k\n\x18UploadLocalMetricsUpdate\x12$.openfl_proto.LocalValidationResults\x1a\'.openfl_proto.LocalValidationResultsAck\"\x00\x62\x06proto3'
 )
 
 _JOB = _descriptor.EnumDescriptor(
@@ -51,8 +51,8 @@ _JOB = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1800,
-  serialized_end=1891,
+  serialized_start=1823,
+  serialized_end=1914,
 )
 _sym_db.RegisterEnumDescriptor(_JOB)
 
@@ -662,6 +662,13 @@ _GLOBALMODELUPDATE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='metadata_yaml', full_name='openfl_proto.GlobalModelUpdate.metadata_yaml', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -675,7 +682,7 @@ _GLOBALMODELUPDATE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=1438,
-  serialized_end=1567,
+  serialized_end=1590,
 )
 
 
@@ -712,8 +719,8 @@ _JOBREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1569,
-  serialized_end=1656,
+  serialized_start=1592,
+  serialized_end=1679,
 )
 
 
@@ -743,8 +750,8 @@ _LOCALMODELUPDATEACK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1658,
-  serialized_end=1724,
+  serialized_start=1681,
+  serialized_end=1747,
 )
 
 
@@ -774,8 +781,8 @@ _LOCALVALIDATIONRESULTSACK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1726,
-  serialized_end=1798,
+  serialized_start=1749,
+  serialized_end=1821,
 )
 
 _METADATAPROTO_INTTOFLOATENTRY.containing_type = _METADATAPROTO
@@ -949,8 +956,8 @@ _AGGREGATOR = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=1894,
-  serialized_end=2255,
+  serialized_start=1917,
+  serialized_end=2278,
   methods=[
   _descriptor.MethodDescriptor(
     name='RequestJob',

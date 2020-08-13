@@ -12,6 +12,7 @@ def federate(flplan,
              collaborator_common_names,
              base_dir,
              weights_dir,
+             metadata_dir,
              model_device):   
 
     # create the data objects for each collaborator
@@ -31,7 +32,8 @@ def federate(flplan,
     aggregator = create_aggregator_object_from_flplan(flplan,
                                                       collaborator_common_names,
                                                       None,
-                                                      weights_dir)
+                                                      weights_dir,
+                                                      metadata_dir)
 
     # create the collaborators
     collaborators = {} 
@@ -42,6 +44,7 @@ def federate(flplan,
                                                    local_config,
                                                    base_dir,
                                                    weights_dir,
+                                                   metadata_dir,
                                                    data_object=data_objects[collaborator_common_name],
                                                    model_object=model,
                                                    compression_pipeline=compression_pipeline,

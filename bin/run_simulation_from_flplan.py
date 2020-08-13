@@ -37,6 +37,7 @@ def main(plan, collaborators_file, data_config_fname, logging_config_path, loggi
     base_dir = os.path.join(script_dir, 'federations')
     plan_dir = os.path.join(base_dir, 'plans')
     weights_dir = os.path.join(base_dir, 'weights')
+    metadata_dir = os.path.join(base_dir, 'metadata')
     collaborators_dir = os.path.join(base_dir, 'collaborator_lists')
     logging_config_path = os.path.join(script_dir, logging_config_path)
     logging_directory = os.path.join(script_dir, logging_directory)
@@ -55,6 +56,7 @@ def main(plan, collaborators_file, data_config_fname, logging_config_path, loggi
              collaborator_common_names,
              base_dir,
              weights_dir,
+             metadata_dir,
              model_device)
 
 

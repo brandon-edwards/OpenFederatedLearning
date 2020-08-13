@@ -107,6 +107,7 @@ message GlobalModelUpdate {
     MessageHeader header = 1;
     ModelProto model = 2;
     bool is_global_best = 3;
+    string metadata_yaml = 4;
 }
 
 

@@ -28,6 +28,7 @@ def main(plan, collaborators_file, single_col_cert_common_name, logging_config_p
     plan_dir = os.path.join(base_dir, 'plans')
     weights_dir = os.path.join(base_dir, 'weights')
     collaborators_dir = os.path.join(base_dir, 'collaborator_lists')
+    metadata_dir = os.path.join(base_dir, 'metadata')
     logging_config_path = os.path.join(script_dir, logging_config_path)
     logging_directory = os.path.join(script_dir, logging_directory)
 
@@ -36,7 +37,7 @@ def main(plan, collaborators_file, single_col_cert_common_name, logging_config_p
     flplan = parse_fl_plan(os.path.join(plan_dir, plan))
     collaborator_common_names = load_yaml(os.path.join(collaborators_dir, collaborators_file))['collaborator_common_names']
 
-    agg             = create_aggregator_object_from_flplan(flplan, collaborator_common_names, single_col_cert_common_name, weights_dir)
+    agg             = create_aggregator_object_from_flplan(flplan, collaborator_common_names, single_col_cert_common_name, weights_dir, metadata_dir)
     server          = create_aggregator_server_from_flplan(agg, flplan)
     serve_kwargs    = get_serve_kwargs_from_flpan(flplan, base_dir)
     

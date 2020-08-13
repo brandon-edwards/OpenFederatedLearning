@@ -72,12 +72,14 @@ class Collaborator(object):
                  single_col_cert_common_name=None,
                  save_best_native_path=None,
                  save_best_native_kwargs=None,
+                 save_metadata_path=None,
                  **kwargs):
         self.logger = logging.getLogger(__name__)
         self.channel = channel
         self.polling_interval = polling_interval
         self.save_best_native_path = save_best_native_path
         self.save_best_native_kwargs = save_best_native_kwargs
+        self.save_metadata_path = save_metadata_path
 
         # this stuff is really about sanity/correctness checking to ensure the bookkeeping and control flow is correct
         self.common_name = collaborator_common_name
@@ -431,6 +433,12 @@ class Collaborator(object):
         if reply.is_global_best and self.save_best_native_path:
             self.wrapped_model.save_native(self.save_best_native_path, self.save_best_native_kwargs)
             self.logger.info("Saving best model to {}".format(self.save_best_native_path))
+
+        # if we should save metadata and have meta in protobuf
+        if self.save_metadata_path is not None and reply.metadata_yaml is not None:
+            with open(self.save_metadata_path, 'w') as f:
+                f.write(reply.metadata_yaml)
+                self.logger.info("Wrote metadata to {}".format(self.save_metadata_path))
 
         # FIXME: for the CONTINUE_LOCAL treatment, we need to store the status in case of a crash.
         if self.opt_treatment == OptTreatment.RESET:

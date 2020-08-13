@@ -7,9 +7,10 @@ import logging
 import time
 
 import numpy as np
+import yaml
 from threading import Lock
 
-from .. import check_equal, check_not_equal, check_is_in, check_not_in
+from .. import check_equal, check_not_equal, check_is_in, check_not_in, load_yaml
 from ..proto.collaborator_aggregator_interface_pb2 import MessageHeader
 from ..proto.collaborator_aggregator_interface_pb2 import Job, JobRequest, JobReply
 from ..proto.collaborator_aggregator_interface_pb2 import JOB_DOWNLOAD_MODEL, JOB_QUIT, JOB_TRAIN, JOB_VALIDATE, JOB_YIELD
@@ -51,6 +52,10 @@ class Aggregator(object):
                  disable_equality_check=True,
                  single_col_cert_common_name=None,
                  compression_pipeline=None,
+                 end_of_round_metadata=None,
+                 init_metadata_fname=None,
+                 latest_metadata_fname=None,
+                 send_metadata_to_clients=False,
                  **kwargs):
         self.logger = logging.getLogger(__name__)
         self.uuid = aggregator_uuid
@@ -82,6 +87,19 @@ class Aggregator(object):
         self.mutex = Lock()
 
         self.compression_pipeline = compression_pipeline or NoCompressionPipeline()
+
+        self.end_of_round_metadata      = end_of_round_metadata
+        self.init_metadata_fname        = init_metadata_fname
+        self.latest_metadata_fname      = latest_metadata_fname
+        self.send_metadata_to_clients   = send_metadata_to_clients
+
+        if self.init_metadata_fname is not None:
+            self.metadata = load_yaml(init_metadata_fname)
+        else:
+            self.metadata = {}
+        self.metadata['aggregator_uuid'] = aggregator_uuid
+        self.metadata['federation_uuid'] = federation_uuid
+        self.metadata_for_round = {}
 
     def valid_collaborator_CN_and_id(self, cert_common_name, collaborator_common_name):
         """Determine if the collaborator certificate and ID are valid for this federation.
@@ -242,6 +260,9 @@ class Aggregator(object):
         round_val = self.get_weighted_average_of_collaborators(self.per_col_round_stats["agg_validation_results"],
                                                                 self.per_col_round_stats["collaborator_validation_sizes"])
 
+        # FIXME: is it correct to put this in the metadata?
+        self.metadata_for_round.update({'loss': float(round_loss), 'round_{}_validation'.format(self.round_num-1): float(round_val)})
+
         # FIXME: proper logging
         self.logger.info('round results for model id/version {}/{}'.format(self.model.header.id, self.model.header.version))
         self.logger.info('\tvalidation: {}'.format(round_val))
@@ -254,6 +275,20 @@ class Aggregator(object):
                                      is_delta=self.model_update_in_progress["is_delta"],
                                      delta_from_version=self.model_update_in_progress["delta_from_version"],
                                      compression_pipeline=self.compression_pipeline)
+
+        # add end of round metadata
+        self.metadata_for_round.update(self.get_end_of_round_metadata())
+
+        # add the metadata for this round to the total metadata file 
+        self.metadata['round {}'.format(self.round_num)] = self.metadata_for_round
+        self.metadata_for_round = {}
+
+        self.logger.info("Metadata:\n{}".format(yaml.dump(self.metadata)))
+
+        if self.latest_metadata_fname is not None:
+            with open(self.latest_metadata_fname, 'w') as f:
+                f.write(yaml.dump(self.metadata))
+            self.logger.info("Wrote metadata to {}".format(self.latest_metadata_fname))
 
         # Save the new model as latest model.
         dump_proto(self.model, self.latest_model_fpath)
@@ -276,6 +311,7 @@ class Aggregator(object):
         self.round_num += 1
         self.logger.debug("Start a new round %d." % self.round_num)
         self.round_start_time = None
+
 
     def UploadLocalModelUpdate(self, message):
         """Parses the collaborator reply message to get the collaborator model update
@@ -517,7 +553,11 @@ class Aggregator(object):
             # TODO: In the future we could send non-delta model here to restore base model.
             raise NotImplementedError('Base of download model delta does not match current collaborator base, and aggregator restoration of base model not implemented.')
 
-        reply = GlobalModelUpdate(header=self.create_reply_header(message), model=self.model, is_global_best=self.aggregated_model_is_global_best)
+        metadata_yaml = None
+        if self.send_metadata_to_clients:
+            metadata_yaml = yaml.dump(self.metadata)
+
+        reply = GlobalModelUpdate(header=self.create_reply_header(message), model=self.model, is_global_best=self.aggregated_model_is_global_best, metadata_yaml=metadata_yaml)
 
         self.logger.debug('aggregator handled RequestJob in time {}'.format(time.time() - t))
 
@@ -552,6 +592,28 @@ class Aggregator(object):
 
     def log_big_warning(self):
         self.logger.warning("\n{}\nYOU ARE RUNNING IN SINGLE COLLABORATOR CERT MODE! THIS IS NOT PROPER PKI AND SHOULD ONLY BE USED IN DEVELOPMENT SETTINGS!!!! YE HAVE BEEN WARNED!!!".format(the_dragon))
+
+    def get_end_of_round_metadata(self):
+        metadata = {}
+        
+        # if no metadata to get, return empty dict
+        if self.end_of_round_metadata is None:
+            return metadata
+        
+        # otherwise, iterate through list of function calls
+        for func_name in self.end_of_round_metadata:
+            try:
+                func = getattr(self, func_name)
+                metadata[func_name] = func()
+            except AttributeError as e:
+                self.logger.critical("Aggregator unable to compute metadata: no Aggregator function called {}. Check the flplan/aggregator_object_init/init_kwargs/end_of_round_metadata list for this name. It may be misspelled".format(func_name))
+        return metadata
+
+    def aggregation_time(self):
+        return time.time()
+
+    def participant_training_data_size(self):
+        return sum(list(self.per_col_round_stats["collaborator_training_sizes"].values()))
 
 
 the_dragon = """

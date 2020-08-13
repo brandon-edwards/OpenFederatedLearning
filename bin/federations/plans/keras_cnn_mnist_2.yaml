@@ -12,6 +12,12 @@ aggregator_object_init:
     init_model_fname: keras_cnn_mnist_init.pbuf
     latest_model_fname: keras_cnn_mnist_latest.pbuf
     rounds_to_train: 6
+    end_of_round_metadata:
+      - aggregation_time
+      - participant_training_data_size
+    init_metadata_fname   : keras_cnn_mnist_metadata_init.yaml
+    latest_metadata_fname : keras_cnn_mnist_metadata_latest.yaml
+    send_metadata_to_clients: true
 
 collaborator_object_init:
   init_kwargs:
@@ -19,6 +25,7 @@ collaborator_object_init:
     opt_treatment: RESET
     polling_interval: 4
     send_model_deltas: false
+    save_metadata_path: keras_cnn_mnist_metadata.yaml
 
 data_object_init:
   class_to_init: openfl.data.tensorflow.tfmnist_inmemory.TensorFlowMNISTInMemory
