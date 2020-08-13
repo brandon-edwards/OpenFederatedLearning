@@ -30,13 +30,22 @@ class Aggregator(object):
     """An Aggregator is the central node in federated learning.
 
     Args:
-        id (string): Aggregation ID.
-        federation_uuid (string): Federation ID
-        collaborator_common_names (list of str): The list of IDs of enrolled collaborators.
-        connection : Used to be ZMQ connection, but deprecated in gRPC.
-        init_model_fpath (string): The location of the initial weight file.
-        latest_model_fpath (string): The file location to store the latest weight.
-        best_model_fpath (string): The file location to store the weight of the best model.
+        aggregator_uuid (string)                : UUID of this object.
+        federation_uuid (string)                : Federation UUID.
+        collaborator_common_names (list of str) : The list of approved collaborator IDs. These IDs should match the common_names in the collaborator certificates, unless "single_col_cert_common_name" is specified.
+        init_model_fpath (string)               : The filepath of the initial weights file.
+        latest_model_fpath (string)             : The filepath to store the latest aggregated weights
+        best_model_fpath (string)               : The filepath to store the weight of the best model.
+        rounds_to_train (int)                   : Number of rounds to train (default: 256)
+        minimum_reporting (int)                 : Aggregator will not end a round early until this number of clients has reported in. (default: -1)
+        straggler_cutoff_time (scalar)          : Aggregator will not end a round early until this number of seconds has passed. (default: np.inf)
+        single_col_cert_common_name (string)    : (default: None)
+        compression_pipeline                    : (default: None)
+        end_of_round_metadata (list of str)     : (default: None)
+        init_metadata_fname (string)            : (default: None)
+        latest_metadata_fname (string)          : (default: None)
+        send_metadata_to_clients (bool)         : (default: False)
+        kwargs                                  : Currently unused
     """
     # FIXME: no selector logic is in place
     def __init__(self,
@@ -49,7 +58,6 @@ class Aggregator(object):
                  rounds_to_train=256,
                  minimum_reporting=-1,
                  straggler_cutoff_time=np.inf,
-                 disable_equality_check=True,
                  single_col_cert_common_name=None,
                  compression_pipeline=None,
                  end_of_round_metadata=None,
@@ -68,7 +76,6 @@ class Aggregator(object):
         self.round_num = 1
         self.rounds_to_train = rounds_to_train
         self.quit_job_sent_to = []
-        self.disable_equality_check = disable_equality_check
         self.minimum_reporting = minimum_reporting
         self.straggler_cutoff_time = straggler_cutoff_time
         self.round_start_time = None
@@ -379,16 +386,6 @@ class Aggregator(object):
                     g = self.model_update_in_progress["tensor_dict"][name]
                     # check that g and l have the same shape
                     check_equal(g.shape, l.shape, self.logger)
-
-                    # sanity check that the tensors are indeed different for non opt tensors
-                    # TODO: modify this to better comprehend for non pytorch how to identify the opt portion (use model opt info?)
-                    if (not self.disable_equality_check \
-                        and not name.startswith('__opt') \
-                        and 'RMSprop' not in name \
-                        and 'Adam' not in name \
-                        and 'RMSProp' not in name):
-                        check_equal(np.all(g == l), False, self.logger)
-
 
                     # now store a weighted average into the update in progress
                     self.model_update_in_progress["tensor_dict"][name] = np.average([g, l], weights=[weight_g, weight_l], axis=0)
