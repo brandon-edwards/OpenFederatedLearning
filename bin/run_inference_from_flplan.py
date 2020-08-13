@@ -31,7 +31,7 @@ def remove_and_save_holdout_tensors(tensor_dict):
         return shared_tensors, holdout_tensors
 
 
-def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, logging_config_path, logging_default_level, logging_directory):
+def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, logging_config_path, logging_default_level, logging_directory, model_device):
     """Runs the inference according to the flplan, data-dir and weights file. Output format is determined by the data object in the flplan
 
     Args:
@@ -68,7 +68,7 @@ def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, 
     data = create_data_object_with_explicit_data_path(flplan=flplan, data_path=data_dir)
 
     # create the model object
-    model = create_model_object(flplan, data)
+    model = create_model_object(flplan, data, device=model_device)
 
     # record which tensors were held out from the saved proto
     _, holdout_tensors = remove_and_save_holdout_tensors(model.get_tensor_dict())
@@ -105,5 +105,7 @@ if __name__ == '__main__':
     parser.add_argument('--logging_config_path', '-lc', type=str, default="logging.yaml")
     parser.add_argument('--logging_default_level', '-l', type=str, default="info")
     parser.add_argument('--logging_directory', '-ld', type=str, default="logs")
+    # FIXME: this kind of commandline configuration needs to be done in a consistent way
+    parser.add_argument('--model_device', '-md', type=str, default='cpu')
     args = parser.parse_args()
     main(**vars(args))
