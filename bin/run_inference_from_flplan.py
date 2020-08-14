@@ -68,7 +68,7 @@ def main(plan, model_weights_filename, native_model_weights_filepath, data_dir, 
     data = create_data_object_with_explicit_data_path(flplan=flplan, data_path=data_dir)
 
     # create the model object
-    model = create_model_object(flplan, data, device=model_device)
+    model = create_model_object(flplan, data, model_device=model_device)
 
     # record which tensors were held out from the saved proto
     _, holdout_tensors = remove_and_save_holdout_tensors(model.get_tensor_dict())
