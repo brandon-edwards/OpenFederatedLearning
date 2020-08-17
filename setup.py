@@ -27,6 +27,6 @@ setup(name='openfl',
                 'openfl.models.tensorflow.tf_2dunet',
                 'openfl.data.tensorflow',
                 ],
-      install_requires=['protobuf', 'pyyaml', 'grpcio', 'tqdm', 'coloredlogs', 
+      install_requires=['protobuf', 'pyyaml', 'grpcio==1.30.0', 'tqdm', 'coloredlogs', 
                         'sklearn', 'coloredlogs', 'SimpleITK', 'pandas']
 )
