@@ -25,6 +25,8 @@ data_object_init:
   data_name_in_local_config: mnist_shard
   init_kwargs:
     nb_collaborators: 10
+    batch_size: 256                                                                                                                                                                                                                
+    channels_last: true
 
 model_object_init:
   class_to_init: openfl.models.tensorflow.keras_cnn.keras_cnn.KerasCNN
