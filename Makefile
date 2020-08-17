@@ -3,7 +3,10 @@
 
 # Docker support removed from Makefile for now
 
-python_version ?= python3.6
+python_version ?= python3
+
+# FIXME: how can we use this to help detect unsupported python versions
+python_minor_version := $(shell python3 -c 'import sys; print(sys.version_info.minor)')
 
 # our phony targets
 .PHONY: install_openfl

@@ -183,11 +183,10 @@ class PyTorchFLModel(nn.Module, FLModel):
             None
         """
         pickle_dict = torch.load(filepath, map_location=torch.device(self.device))
-        # FIXME: maybe we need more flexible way to handle .pt files that have different keys or layers of keys
-		# FIXME: need to not catch all exceptions
+        # FIXME maybe we need more flexible way to handle .pt files that have different keys or layers of keys
         try:
             self.load_state_dict(pickle_dict[model_state_dict_key])
-        except:
+        except KeyError:
             self.load_state_dict(pickle_dict)
         if optimizer_state_dict_key in pickle_dict.keys():
             self.optimizer.load_state_dict(pickle_dict[optimizer_state_dict_key])
