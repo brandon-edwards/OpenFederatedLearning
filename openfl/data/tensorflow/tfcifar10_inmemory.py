@@ -6,6 +6,7 @@ from openfl.data.tensorflow.tffldata_inmemory import TensorFlowFLDataInMemory
 #from openfl.data import load_cifar10_shard
 
 from math import ceil
+import tensorflow.keras as keras
 from tensorflow.keras import backend as K
 from tensorflow.keras import backend as K
 from tensorflow.python.keras.utils.data_utils import get_file

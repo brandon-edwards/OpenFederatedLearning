@@ -19,18 +19,6 @@ def _load_raw_datashards(shard_num, nb_collaborators):
     Returns:
         2 tuples: (image, label) of the training, validation dataset     
     """
-    #origin_folder = 'https://storage.googleapis.com/tensorflow/tf-keras-datasets/'             
-    #path = get_file('mnist.npz',
-    #                origin=origin_folder + 'mnist.npz',
-    #                file_hash='731c5ac602752760c8e48fbffcf8c3b850d9dc2a2aedcf2cc48468fc17b673d1')
-       
-    #with np.load(path) as f: 
-    #    # get all of mnist
-    #    X_train_tot = f['x_train']
-    #    y_train_tot = f['y_train']
-       
-    #    X_test_tot = f['x_test']
-    #    y_test_tot = f['y_test']
     train_obj = torchvision.datasets.MNIST('~/.MNIST', train=True, download=True) 
     test_obj = torchvision.datasets.MNIST('~/.MNIST', train=False, download=True) 
     X_train_tot = train_obj.data.numpy()
