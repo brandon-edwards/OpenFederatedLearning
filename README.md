@@ -1,17 +1,18 @@
-# Copyright (C) 2020 Intel Corporation
-# Licensed subject to the terms of the separately executed evaluation license agreement between Intel Corporation and you.
+# Welcome to OpenFL
 
-[![pipeline status](https://gitlab.devtools.intel.com/weilinxu/spr_secure_intelligence-trusted_federated_learning/badges/master/pipeline.svg)](https://gitlab.devtools.intel.com/weilinxu/spr_secure_intelligence-trusted_federated_learning/commits/master)
-[![coverage report](https://gitlab.devtools.intel.com/weilinxu/spr_secure_intelligence-trusted_federated_learning/badges/master/coverage.svg)](https://gitlab.devtools.intel.com/weilinxu/spr_secure_intelligence-trusted_federated_learning/commits/master)
+The Open Federated Learning (OpenFL) framework was kickstarted and developed as part of a collaboration between Intel and the University of Pennsylvania (UPenn) and describes  Intel’s commitment to the grant from the Informatics Technology for Cancer Research (ITCR) program of the National Cancer Institute (NCI) of the National Institutes of Health (NIH) awarded to the UPenn for the development of the Federated Tumor Segmentation (FeTS, https://www.fets.ai/) platform (grant award number: U01-CA242871). FeTS is an exciting, real-world medical FL platform, and we are honored to be collaborating with UPenn in leading a federation of international collaborators. Although OpenFL was designed to serve as the backend for the FeTS platform, and OpenFL developers and researchers continue to work very closely with UPenn on the FeTS project, OpenFL was built to be agnostic to the use-case and the machine learning framework, and we welcome input from domains outside medicine and imaging. 
 
-Notes for learning how this codebase works:
+We’ve included the FeTS-AI/Algorithms (https://github.com/FETS-AI/Algorithms) repository as a submodule of OpenFL to highlight how OpenFL serves as the FeTS backend. While not necessary to run OpenFL, the FeTS algorithms show real-world FL models and use cases. Additionally, the FeTS-AI/Front-End (https://github.com/FETS-AI/Front-End) shows how UPenn and Intel have integrated UPenn’s medical AI expertise with Intel’s OpenFL to create a federated learning solution for medical imaging. 
 
+### Requirements
 
-*  docs/tutorial.docker.rst shows how to use docker containers to run a federation.
-*  docs/tutorial.simulation.rst shows how to install into a virtualenv for running single-process simulations (the aggregator and collaborators run round-robin, and will even share the graph in serial fashion, correctly saving/restoring state).
-*  To learn about setting up a federation and configuring it, start with the scripts in the /bin folder that are launched by the tutorials (run_aggregator_from_flplan.py and run_collaborator_from_flplan.py, or run_simulation_from_flplan.py). Then look at the .yaml files in /bin/federations/plans to see how federations are configured. 
-*  To learn about porting a model to run in a federation, start with the flmodel.py and the related framework-specific sub-classes (pytorchflmodel.py, kerasflmodel.py, and tfflmodel.py)
+- OS: Primarily tested on Ubuntu 16.04 and 18.04, but code should be OS-agnostic. (Optional shell scripts may not be).
+- Python 3.5+
+- Makefile setup scripts require python3.x-venv
+- Sample models require TensorFlow 1.x or PyTorch. Primarily tested with TensorFlow 1.13-1.15.2 and Pytorch 1.2-1.6 
 
+### Coming Soon
+- Graphene-SGX recipes for running the aggregator inside SGX (https://github.com/oscarlab/graphene)
+- Improved error messages for common errors
 
-
-
+Copyright (C) 2020 Intel Corporation
