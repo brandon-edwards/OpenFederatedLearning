@@ -16,14 +16,9 @@
 #
 import os
 import sys
+from datetime import datetime
+
 sys.path.insert(0, os.path.abspath('../'))
-
-# -- Project information -----------------------------------------------------
-
-project = 'openfl'
-copyright = '2020, Intel'
-author = 'Secure Intelligence Team'
-master_doc = 'index'
 
 # -- General configuration ---------------------------------------------------
 
@@ -36,8 +31,37 @@ import sphinxcontrib.napoleon
 extensions = [
     "sphinx_rtd_theme",
     'sphinx.ext.autosectionlabel',
-    "sphinxcontrib.napoleon"
+    "sphinxcontrib.napoleon",
+    "rinoh.frontend.sphinx",
+    "sphinx-prompt",
+    'sphinx_substitution_extensions',
+    "sphinx.ext.ifconfig",
 ]
+
+# -- Project information -----------------------------------------------------
+
+# This will replace the |variables| within the rST documents automatically
+
+#PRODUCT_VERSION = "Intel"
+PRODUCT_VERSION = "OFL"
+
+tags.add(PRODUCT_VERSION)
+
+project = 'Open Federated Learning'
+author = 'Intel Corporation'
+master_doc = 'index'
+version = "{}.{}".format(datetime.now().year, datetime.now().month)
+
+# Global variables for rST
+rst_prolog = """
+.. |productName| replace:: Open Federated Learning
+.. |productZip| replace:: OpenFederatedLearning.zip
+.. |productDir| replace:: OpenFederatedLearning
+
+.. _Makefile: https://github.com/IntelLabs/OpenFederatedLearning/blob/master/Makefile
+"""
+
+rinoh_documents = [('index', u'open_fl_manual', u'Open Federated Learning Manual', u'FeTS')]
 
 napoleon_google_docstring = True
 
@@ -47,7 +71,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', "tutorials/*", "graveyard/*"]
 
 
 # -- Options for HTML output -------------------------------------------------
