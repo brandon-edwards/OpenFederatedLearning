@@ -478,7 +478,7 @@ class Aggregator(object):
             job = JOB_QUIT
             self.quit_job_sent_to.append(message.header.sender)
         # FIXME: this flow needs to depend on a job selection output for the round
-        # for now, all jobs require and in-sync model, so it is the first check
+        # for now, all jobs require an in-sync model, so it is the first check
         # check if the sender model is out of date
         elif self.collaborator_out_of_date(message.model_header):
             job = JOB_DOWNLOAD_MODEL

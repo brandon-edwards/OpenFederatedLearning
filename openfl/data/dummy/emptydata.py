@@ -21,24 +21,24 @@ class EmptyData(FLData):
     def get_feature_shape(self):
         """Returns the shape of the input (feature) array
         """
-        return 0  #FIXME: NotImplemented Exception?
+        return 0
 
     def get_train_loader(self):
         """Returns the training data loader object
         """
-        return 0  #FIXME: NotImplemented Exception?
+        return 0
 
     def get_val_loader(self):
         """Returns the validation data loader object
         """
-        return 0  #FIXME: NotImplemented Exception?
+        return 0
 
     def get_training_data_size(self):
         """Return the size of the training data array
         """
-        return self.train_size #FIXME: NotImplemented Exception?
+        return self.train_size
 
     def get_validation_data_size(self):
         """Return the size of the validation data array
         """
-        return self.val_size  #FIXME: NotImplemented Exception?
+        return self.val_size

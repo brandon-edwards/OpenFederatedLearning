@@ -214,7 +214,7 @@ class TensorFlowFLModel(FLModel):
         self.sess.run(tf.global_variables_initializer())
 
 
-# FIXME: what's a nicer construct than this? ugly interface. Perhaps we get an object with an assumed interface that lets is set/get these?
+# FIXME: Need a cleaner interface. Perhaps we get an object with an assumed interface that lets is set/get these?
 # Note that this will return the assign_ops and placeholder nodes it uses
 # if called with None, it will create them.
 # to avoid inflating the graph, caller should keep these and pass them back
