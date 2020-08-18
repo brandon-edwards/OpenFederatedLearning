@@ -6,7 +6,7 @@ We’ve included the FeTS-AI/Algorithms (https://github.com/FETS-AI/Algorithms) 
 
 ### Requirements
 
-- OS: Primarily tested on Ubuntu 16.04 and 18.04. Code should be OS-agnostic, but scripts may not be.
+- OS: Primarily tested on Ubuntu 16.04 and 18.04, but code should be OS-agnostic. (Optional shell scripts may not be).
 - Python 3.5+
 - Makefile setup scripts require python3.x-venv
 - Sample models require TensorFlow 1.x or PyTorch. Primarily tested with TensorFlow 1.13-1.15.2 and Pytorch 1.2-1.6 
