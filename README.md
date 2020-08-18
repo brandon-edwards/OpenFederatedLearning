@@ -14,5 +14,7 @@ We’ve included the FeTS-AI/Algorithms (https://github.com/FETS-AI/Algorithms) 
 ### Coming Soon
 - Graphene-SGX recipes for running the aggregator inside SGX (https://github.com/oscarlab/graphene)
 - Improved error messages for common errors
+- FL Plan authoring guide
+- Model porting guide and tutorials
 
 Copyright (C) 2020 Intel Corporation
