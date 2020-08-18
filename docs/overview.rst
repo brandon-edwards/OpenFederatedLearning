@@ -8,6 +8,7 @@ Overview
 .. toctree::
 
    overview.what_is_federated_learning
+   overview.pki_requirements
 
 
 
