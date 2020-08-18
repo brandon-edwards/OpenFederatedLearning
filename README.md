@@ -11,4 +11,8 @@ We’ve included the FeTS-AI/Algorithms (https://github.com/FETS-AI/Algorithms) 
 - Makefile setup scripts require python3.x-venv
 - Sample models require TensorFlow 1.x or PyTorch. Primarily tested with TensorFlow 1.13-1.15.2 and Pytorch 1.2-1.6 
 
+### Coming Soon
+- Graphene-SGX recipes for running the aggregator inside SGX (https://github.com/oscarlab/graphene)
+- Improved error messages for common errors
+
 Copyright (C) 2020 Intel Corporation
