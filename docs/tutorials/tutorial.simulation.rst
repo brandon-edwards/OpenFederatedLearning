@@ -15,7 +15,7 @@ Simulations are run from an flplan, and in fact the same flplan that is used for
 
 **Note that simulations utilize a single model, with each new collaborator taking control of the model when it is their turn in the round-robin. It is therefore crtical that the model set_tensor_dict method completely overwrites all substantive model state in order that state does not leak from the collabotor who previously held the model.**
 
-The steps for runnins a simulation
+The steps for running a simulation
 ----------------------------------
 
 Simulated Federated Training of an MNIST Classifier across 10 Collaborators [using the flplan keras_cnn_mnist_10.yaml]
