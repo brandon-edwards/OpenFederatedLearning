@@ -4,16 +4,16 @@
 Running a Federation Simulation (no network, single process)
 -------------------------------------------
 
-When exploring the convergence properties of federated learning for a particular use-case, it helpful to run several federations in parallel, each of which runs the aggregator and collaborators (round-robin) in a single process avoiding the need for network communication. We describe here how to run one of these simulations.
+When exploring the convergence properties of federated learning for a particular use-case, it is helpful to run several federations in parallel, each of which runs the aggregator and collaborators (round-robin) in a single process avoiding the need for network communication. We describe here how to run one of these simulations.
 
 Note that much of the code used for simulation (ex. collaborator and aggregator objects) is the
-same as for the multiprocess solution with grpc. Since the collaborator calls aggregator object 
+same as for the multiprocess solution with grpc. Since the collaborator calls the aggregator object 
 methods via the grpc channel object, simulation is performed by simply replacing the channel object
 provided to each collaborator with the aggregator object.
 
 Simulations are run from an flplan, and in fact the same flplan that is used for a multi-process federation can be used.  
 
-**Note that simulations utilize a single model, with each new collaborator taking control of the model when it is their turn in the round-robin. It is therefore crtical that the model set_tensor_dict method completely overwrites all substantive model state in order that state does not leak from the collabotor who previously held the model.**
+**Note that simulations utilize a single model, with each new collaborator taking control of the model when it is their turn in the round-robin. It is therefore critical that the model, 'set_tensor_dict' method completely overwrites all substantive model state in order that state does not leak from the collabotor who previously held the model.**
 
 The steps for running a simulation
 ----------------------------------
@@ -23,13 +23,13 @@ Simulated Federated Training of an MNIST Classifier across 10 Collaborators [usi
 
 1. Go through the steps for project installation and setup [link], skipping the creation of PKI.
 
-2. Create the initial weights file using the flpan [link].
+2. Create the initial weights file using the keras_cnn_mnist_10.yaml plan [link].
 
-3. Kick off the simulation.
+3. Kick off the simulation using the keras_cnn_mnist_10.yaml plan and the collaborator list of ten collaborators provided in the repository to be used with this plan and the default local data config.
 
 .. code-block:: console
 
-  $ ../venv/bin/python run_simulation_from_flplan.py -p keras_cnn_mnist_10.yaml
+  $ ../venv/bin/python run_simulation_from_flplan.py -p keras_cnn_mnist_10.yaml -c cols_10.yaml
 
 
 
