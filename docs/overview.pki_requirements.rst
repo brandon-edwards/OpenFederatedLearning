@@ -2,12 +2,16 @@
 .. # Licensed subject to the terms of the separately executed evaluation license agreement between Intel Corporation and you.
 
 *****************************************
-PKI Requirements
+Digital Certificates and PKI Requirements
 *****************************************
+By default, |productName| uses the TLS protocol to secure all network connections.
 
-By default, |productName| uses `TLS <https://en.wikipedia.org/wiki/Transport_Layer_Security>`_ encryption for the network connections.
+**<DRAFT_DISCLAIMER>**  
 
-TODO: MIKE BEALE PLEASE ADD DISCLAIMER HERE!!!
+**NOTE: Proper consideration needs to be taken when deploying Open Federated Learning in a production environment.  Due to the research nature of this project, Intel does not provide any mechanism to acquire digital certificates for the aggregator or collaborator endpoints.**
+ 
+**If your intention is to deploy Open Federated Learning in a production environment, it is your responsibility to properly create and secure the private keys for your endpoint as well as aquire properly signed digital certificates from a trusted CA vendor.**
+**<DRAFT_DISCLAIMER>** 
 
 Collaborator-to-Aggregator TLS
 ##############################
