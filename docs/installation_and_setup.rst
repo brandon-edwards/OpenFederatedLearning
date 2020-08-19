@@ -4,7 +4,7 @@
 .. _install_software_root:
 
 ***********************
-Installing the Software
+Instalation and Setup
 ***********************
 
 NOTE: This project is expected to be continually developed and improved.
@@ -12,6 +12,7 @@ Changes to this manual, the project code, the project design should be expected.
 
 .. toctree::
 
-   install.design
-   install.certificates
    install.installing
+   install.setting_defaults
+   install.certificates
+   
