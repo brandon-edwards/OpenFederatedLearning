@@ -31,9 +31,9 @@ The steps for running a simulation
 Simulated Federated Training of an MNIST Classifier across 10 Collaborators [using the flplan keras_cnn_mnist_10.yaml]
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Go through the steps for project installation and setup [:ref:'installation_and_setup'], skipping the creation of PKI.
+1. Go through the steps for project installation and setup [:ref:`installation and setup`], skipping the creation of PKI.
 
-2. Create the initial weights file using the keras_cnn_mnist_10.yaml plan [:ref:'creating_initial_weights'].
+2. Create the initial weights file using the keras_cnn_mnist_10.yaml plan [:ref:`creating_initial_weights`].
 
 3. Kick off the simulation using the keras_cnn_mnist_10.yaml plan and the collaborator list of ten collaborators provided in the repository to be used with this plan and the default local data config.
 
