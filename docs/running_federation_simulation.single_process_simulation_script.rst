@@ -28,22 +28,20 @@ Simulations are run from an flplan, and in fact the same flplan that is used for
 The steps for running a simulation
 ----------------------------------
 
-Simulated Federated Training of an MNIST Classifier across 10 Collaborators [using the flplan keras_cnn_mnist_10.yaml]
-^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Go through the steps for project installation and setup [:ref:`installation and setup`], skipping the creation of PKI.
+1. Go through the steps for project :ref:`installation_and_setup`  with the following in mind. --WORKING HERE---In this case, we require make install_openfl and make install_openfl_tensorflow. The tensorflow piece is required, as we will have the aggregator create the initial weights using the model code. The aggregator does not require this otherwise,and indeed the creation of initial weights can be done on a collaborator machine and copied to the aggregator (who needs it to start the federation) if you wish. Though the collaborator list we use here is already provided in the repository (and is already compatible with the flplan and local_data_config default file), you will also need to make sure you create a copy of the network config as part of this setup and enter in the appropriate FQDN for this machine that is running the aggregator. Finally the PKI creation step can be skipped as we will not be using the network here.
 
-2. Create the initial weights file using the keras_cnn_mnist_10.yaml plan [:ref:`creating_initial_weights`].
+2. Now follow the stps for :ref:`creating_initial_weights` from the flplan.
 
-3. Kick off the simulation using the keras_cnn_mnist_10.yaml plan and the collaborator list of ten collaborators provided in the repository to be used with this plan and the default local data config.
+3. Kick off the simulation using the flplan and the appropriate (make sure that the collaborators listed in your list are provided in included in the local data config --WORKKING HERE TOO--.
 
 .. code-block:: console
 
-  $ ../venv/bin/python run_simulation_from_flplan.py -p keras_cnn_mnist_10.yaml -c cols_10.yaml
+  $ ../venv/bin/python run_simulation_from_flplan.py -p <flpan filename> -c <collaborators list filename>
 
 
 
-4. You'll find the output from the aggregator in bin/logs/aggregator.log. Grep this file to see results (one example below). You can check the progress as the simulation runs, if desired.
+4. --WOKING HREE--You'll find the output from the aggregator in bin/logs/aggregator.log. Grep this file to see results (one example below). You can check the progress as the simulation runs, if desired.
 
 .. code-block:: console
 
