@@ -11,7 +11,7 @@
 .. # See the License for the specific language governing permissions and
 .. # limitations under the License.
 
-.. _installation_and_setup:
+.. _installation and setup:
 
 ***********************
 Installation and Setup
