@@ -37,7 +37,7 @@ The steps for running a simulation
 
   $ ../venv/bin/python create_initial_weights_file_from_flplan.py -p <flpan filename> -c <collaborators list filename>
 
-3. Again from the bin directory, kick off the simulation by running (with the additional parameter WORKING HeRE): 
+3. Again from the bin directory, kick off the simulation by running the following: 
 
 .. code-block:: console
 
@@ -45,25 +45,8 @@ The steps for running a simulation
 
 
 
-4. --WOKING HREE--You'll find the output from the aggregator in bin/logs/aggregator.log. Grep this file to see results (one example below). You can check the progress as the simulation runs, if desired.
+4. You'll find the output from the aggregator in bin/logs/aggregator.log. Grep this file to see results. You can check the progress as the simulation runs, if desired. The aggregator.log is always appended to, so will include results from previous runs.
 
-.. code-block:: console
-
-  $ pwd                                                                                                                                                                                                                            msheller@spr-gpu01
-    /home/<user>/git/openfl/bin
-  $ grep -A 2 "round results" logs/aggregator.log
-    2020-03-30 13:45:33,404 - openfl.aggregator.aggregator - INFO - round results for model id/version KerasCNN/1
-    2020-03-30 13:45:33,404 - openfl.aggregator.aggregator - INFO -        validation: 0.4465000107884407
-    2020-03-30 13:45:33,404 - openfl.aggregator.aggregator - INFO -        loss: 1.0632034242153168
-    --
-    2020-03-30 13:45:35,127 - openfl.aggregator.aggregator - INFO - round results for model id/version KerasCNN/2
-    2020-03-30 13:45:35,127 - openfl.aggregator.aggregator - INFO -        validation: 0.8630000054836273
-    2020-03-30 13:45:35,127 - openfl.aggregator.aggregator - INFO -        loss: 0.41314733028411865
-    --
-
-Note that aggregator.log is always appended to, so will include results from previous runs.
-
-5. Edit the plan to train for more rounds, etc.
 
 
 
