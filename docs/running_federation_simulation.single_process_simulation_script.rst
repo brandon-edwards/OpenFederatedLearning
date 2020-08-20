@@ -29,11 +29,15 @@ The steps for running a simulation
 ----------------------------------
 
 
-1. Go through the steps for project :ref:`installation_and_setup`  with the following in mind. --WORKING HERE---In this case, we require make install_openfl and make install_openfl_tensorflow. The tensorflow piece is required, as we will have the aggregator create the initial weights using the model code. The aggregator does not require this otherwise,and indeed the creation of initial weights can be done on a collaborator machine and copied to the aggregator (who needs it to start the federation) if you wish. Though the collaborator list we use here is already provided in the repository (and is already compatible with the flplan and local_data_config default file), you will also need to make sure you create a copy of the network config as part of this setup and enter in the appropriate FQDN for this machine that is running the aggregator. Finally the PKI creation step can be skipped as we will not be using the network here.
+1. Go through the steps for project :ref:`installation_and_setup`  with the following in mind. In this case, we require make install_openfl as well as installation of ML framework libraries (supported now are make install_openfl_tensorflow and make install_openfl_pytorch) as we will be running both the aggregator and all collaborators (and thus models) here. Though the network will not be used here, we still currently require that the flplan default network file is present even when running simulations, however it's contents can be exactly the same as the example file as far as running simulation goes. Finally, the PKI creation step can be skipped as we will not be using the network here.
 
-2. Now follow the stps for :ref:`creating_initial_weights` from the flplan.
+2. From the bin directory, run the following command (see the notes on :ref:`creating_initial_weights` from the flplan for further options on parameters to this script) :
 
-3. Kick off the simulation using the flplan and the appropriate (make sure that the collaborators listed in your list are provided in included in the local data config --WORKKING HERE TOO--.
+.. code-block:: console
+
+  $ ../venv/bin/python create_initial_weights_file_from_flplan.py -p <flpan filename> -c <collaborators list filename>
+
+3. Again from the bin directory, kick off the simulation by running (with the additional parameter WORKING HeRE): 
 
 .. code-block:: console
 
