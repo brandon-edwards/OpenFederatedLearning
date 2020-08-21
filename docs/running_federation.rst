@@ -21,7 +21,6 @@ We will be training an MNIST classifier using federated learning and two collabo
 
 .. toctree::
 
-   running_federation.configure_aggregator
-   running_federation.running_aggregator
-   running_federation.configure_collaborator
-   running_federation.running_collaborator
+   running_federation.configure
+   running_federation.run
+   
