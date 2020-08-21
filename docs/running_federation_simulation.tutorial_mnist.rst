@@ -11,7 +11,7 @@
 .. # See the License for the specific language governing permissions and
 .. # limitations under the License.
 
-Tutorial: MNIST Classifier Federation Simulation
+Running a Federation Simulation (MNIST Example)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For this example, we will use an example flplan (bin/federations/plans/keras_cnn_mnist_10.yaml) that will work in conjunction with an example collaborators list (bin/federations/collaborator_lists/cols_10.yaml) for which entries already exist in the example local data config (bin/federations/local_data_config.yaml) enabling a predetermined sharding of the MNIST public dataset across 10 collaborators.
