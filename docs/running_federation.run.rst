@@ -11,8 +11,8 @@
 .. # See the License for the specific language governing permissions and
 .. # limitations under the License.
 
-Running the Aggregator
-####################
+Running the Federation
+######################
 
 
 
@@ -36,11 +36,11 @@ the protobuf file that was specified in the YAML file
 (in this case *keras_cnn_mnist_latest.pbuf*).
 
 
-On each Collaborator [col_number = '0' and '1'] do the following:
-####################
+On each Collaborator [col_number = '0' and '1']:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-1.      From the bin directory, run the collaborator using the following script, passing in the shared single collaborator cert common name in order to specify that we are running in single cert test mode (**this mode should only be used for testing purposes**).
+2. From the bin directory, run the collaborator using the following script, passing in the shared single collaborator cert common name in order to specify that we are running in single cert test mode (**this mode should only be used for testing purposes**).
 
 .. code-block:: console
 
