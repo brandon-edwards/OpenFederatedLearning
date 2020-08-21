@@ -34,3 +34,14 @@ connect, the aggregator starts training. When the last round of
 training is complete, the aggregator stores the final weights in
 the protobuf file that was specified in the YAML file
 (in this case *keras_cnn_mnist_latest.pbuf*).
+
+
+On each Collaborator [col_number = '0' and '1'] do the following:
+####################
+
+
+1.      From the bin directory, run the collaborator using the following script, passing in the shared single collaborator cert common name in order to specify that we are running in single cert test mode (**this mode should only be used for testing purposes**).
+
+.. code-block:: console
+
+   $ ../venv/bin/python3 ./run_collaborator_from_flplan.py -p keras_cnn_mnist_2.yaml -col col_<col_number> -scn test
