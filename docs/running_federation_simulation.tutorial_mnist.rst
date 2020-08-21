@@ -77,5 +77,5 @@ Note that aggregator.log is always appended to, so will include results from pre
 Explore Modifications
 ----------------------
 
-7. Edit the plan to train for more rounds, etc.
+7. Edit the plan and related files to train for more rounds, more collaborators etc.
 
