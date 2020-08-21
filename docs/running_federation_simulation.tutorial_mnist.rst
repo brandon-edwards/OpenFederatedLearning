@@ -11,12 +11,13 @@
 .. # See the License for the specific language governing permissions and
 .. # limitations under the License.
 
-Example: MNIST Keras Classifier Federation Simulation [10 Collaborators, using the flplan: keras_cnn_mnist_10.yaml]
+Tutorial: Simulated Federated Training of a Keras MNIST Classifier with 10 Collaborators
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For this example, we will use an example flplan (bin/federations/plans/keras_cnn_mnist_10.yaml) that will work in conjunction with an example collaborators list (bin/federations/collaborator_lists/cols_10.yaml) for which entries already exist in the example local data config (bin/federations/local_data_config.yaml) enabling a predetermined sharding of the MNIST public dataset across 10 collaborators.
 
 Setup and Installation
 ----------------------
-
 
 1. Clone the repository onto a linux machine the has Python 3.5 or greater, and the virtualenv library installed.
 
@@ -32,11 +33,19 @@ Setup and Installation
 
   $ cp bin/federations/plans/defaults/network.yaml.example bin/federations/plans/defaults/network.yaml
   
+  
+Creation of Initial Weights
+---------------------------
+  
 4. Create the initial weights file by running the following command from the bin directory:
 
 .. code-block:: console
 
   $ ../venv/bin/python create_initial_weights_file_from_flplan.py -p <keras_cnn_mnist_10.yaml> -c <cols_10.yaml>
+  
+  
+Launch the Simulated Federation
+-------------------------------
 
 5. Again from the bin directory, kick off the simulation by running the following: 
 
@@ -44,7 +53,8 @@ Setup and Installation
 
   $ ../venv/bin/python run_simulation_from_flplan.py -p <keras_cnn_mnist_10.yaml> -c <cols_10.yaml>
 
-
+Monitor the Progress
+--------------------
 
 6. You'll find the output from the aggregator in bin/logs/aggregator.log. Grep this file to see results (one example below). You can check the progress as the simulation runs, if desired.
 
@@ -63,6 +73,9 @@ Setup and Installation
     --
 
 Note that aggregator.log is always appended to, so will include results from previous runs.
+
+Explore Modifications
+----------------------
 
 7. Edit the plan to train for more rounds, etc.
 
