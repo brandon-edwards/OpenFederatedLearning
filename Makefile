@@ -13,10 +13,43 @@
 
 # Docker support removed from Makefile for now
 
-python_version ?= python3
 
-# FIXME: how can we use this to help detect unsupported python versions
-python_minor_version := $(shell python3 -c 'import sys; print(sys.version_info.minor)')
+# we insist on python3
+python_major_version := 3
+# we detect what the default minor version is for this major version
+default_python_minor_version := $(shell python$(python_major_version) -c 'import sys; print(sys.version_info.minor)')
+found_3_8 := $(shell command -v python3.8)
+found_3_7 := $(shell command -v python3.7)
+found_3_6 := $(shell command -v python3.6)
+			
+	
+
+default_python_version := python$(python_major_version).$(default_python_minor_version)
+
+# SimpleITK, OpenCV do not get installed when the default python3 is 3.9 so we do not accept this version
+find_supported_python_minor_version:
+	ifeq ($(default_python_minor_version), 6)
+		@echo "Default python is 3.9 which gives problems with imports for SimpleITK and OpenCV so we now look for 8, 7, or 6"
+		ifeq ($(found_3_8),)
+			@echo "Did not find python 3.8 will look for 3.7."
+			ifeq ($(found_3_7),)
+				@echo "Did not find python 3.7 will look for 3.6."
+				ifeq ($(found_3_6),)
+					$(error "None of python 3.6, 3.7, or 3.8 can be found, please install one of these and retry.")
+				else
+					@echo "Using python3.6"
+					python_version := python3.6
+				endif
+			else
+				@echo "Using python3.7"
+				python_version := python3.7
+			endif
+		else
+			@echo "Using python3.8"
+			python_version := python3.8
+		endif
+	endif
+	
 
 # our phony targets
 .PHONY: install_openfl
@@ -34,6 +67,7 @@ python_minor_version := $(shell python3 -c 'import sys; print(sys.version_info.m
 .PHONY: openfl_tensorflow_whl
 .PHONY: fets_whl
 .PHONY: gandlf_whl
+.PHONY: python_supported_version
 
 # FIXME: some real makefile fu could probably make this all easier
 
@@ -55,7 +89,7 @@ fets_whl				= submodules/fets_ai/Algorithms/dist/fets-0.0.1-py3-none-any.whl
 gandlf_whl				= submodules/fets_ai/Algorithms/GANDLF/dist/GANDLF-0.0.8-py3-none-any.whl
 
 # the python virtual env recipe
-$(venv):
+$(venv): $(python_supported_version)
 	$(python_version) -m venv venv
 	venv/bin/pip3 install --upgrade pip
 	venv/bin/pip3 install --upgrade setuptools

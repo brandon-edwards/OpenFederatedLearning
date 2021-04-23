@@ -58,7 +58,7 @@ def main(plan,
         logging_config_fname            : The log file
         logging_default_level           : The log level
         model_device                    : gets passed to model 'init' function as "device"
-        brats_stats_upload_filepath     : 
+        brats_stats_upload_filepath     : path to which we store scores, later to be uploaded to aggregator for logging
         local_outputs_directory         : directory to which local model outputs will be stored for both local
                                           and global model valiations every so many epochs determined in the flplan
                                           (if None, will be assigned as logging directory)

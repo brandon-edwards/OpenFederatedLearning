@@ -21,7 +21,7 @@ import importlib
 
 from openfl import split_tensor_dict_for_holdouts
 from openfl.collaborator.collaborator import Collaborator
-from openfl.proto.protoutils import load_legacy_model_protobuf
+from openfl.proto.protoutils import load_model_protobuf
 from openfl.flplan import create_collaborator_object_from_flplan, parse_fl_plan, load_yaml
 from setup_logging import setup_logging
 
@@ -40,7 +40,10 @@ def main(plan,
          logging_config_path, 
          logging_default_level, 
          logging_directory, 
-         model_device):
+         model_device, 
+         brats_stats_upload_filepath, 
+         local_outputs_directory, 
+         model_selection):
     """Runs the collaborator client process from the federation (FL) plan
 
     Args:
@@ -58,6 +61,11 @@ def main(plan,
         logging_config_fname            : The log file
         logging_default_level           : The log level
         model_device                    : gets passed to model 'init' function as "device"
+        brats_stats_upload_filepath     : path to which we store scores, later to be uploaded to aggregator for logging
+        local_outputs_directory         : directory to which local model outputs will be stored for both local
+                                          and global model valiations every so many epochs determined in the flplan
+                                          (if None, will be assigned as logging directory)
+        model_selection                 : choice of 'initial', 'latest', or 'best' (which model to validate)
     """
     # FIXME: consistent filesystem (#15)
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -95,10 +103,12 @@ def main(plan,
                                                         metadata_dir,
                                                         single_col_cert_common_name,
                                                         data_dir=data_dir,
-                                                        model_device=model_device)
+                                                        model_device=model_device, 
+                                                        brats_stats_upload_filepath=brats_stats_upload_filepath, 
+                                                        local_outputs_directory = local_outputs_directory)
     
-    model_protobuf_path = os.path.join(weights_dir, flplan['aggregator_object_init']['init_kwargs']['init_model_fname'])
-    tensor_dict = load_legacy_model_protobuf(model_protobuf_path)
+    model_path = os.path.join(weights_dir, flplan['aggregator_object_init']['init_kwargs']['model_directory'], model_selection)
+    tensor_dict = load_model_protobuf(model_path)
     
     model = collaborator.wrapped_model
 
@@ -133,5 +143,8 @@ if __name__ == '__main__':
     parser.add_argument('--logging_directory', '-ld', type=str, default="logs")
     # FIXME: this kind of commandline configuration needs to be done in a consistent way
     parser.add_argument('--model_device', '-md', type=str, default='cpu')
+    parser.add_argument('--brats_stats_upload_filepath', '-bsuf', type=str, default=None)
+    parser.add_argument('--local_outputs_directory', '-lod', type=str, default=None)
+    parser.add_argument('--model_selection', '-ms', type=str, choices=['initial', 'latest', 'best'], default='best')
     args = parser.parse_args()
     main(**vars(args))

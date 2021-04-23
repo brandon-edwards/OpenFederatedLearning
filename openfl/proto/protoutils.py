@@ -12,7 +12,10 @@
 # limitations under the License.
 
 import numpy as np
-from openfl.proto.collaborator_aggregator_interface_pb2 import TensorProto, DataStream, LegacyModelProto
+import os
+
+from openfl import hash_string
+from openfl.proto.collaborator_aggregator_interface_pb2 import TensorProto, DataStream, LegacyModelProto, ModelHeader, ExtraModelInfo
 
 def tensor_proto_to_numpy_array(tensor_proto):
     return np.frombuffer(tensor_proto.data_bytes, dtype=np.float32).reshape(tuple(tensor_proto.shape))
@@ -103,3 +106,16 @@ def load_legacy_model_protobuf(file_path):
         tensor_dict[t.name] = np.frombuffer(t.data_bytes, dtype=np.float32).reshape(tuple(shape))
 
     return tensor_dict
+
+
+def load_model_protobuf(model_path):
+    extra_model_info = load_proto(os.path.join(model_path, 'ExtraModelInfo.pbuf'), proto_type=ExtraModelInfo)
+
+    tensors = {}
+    for t in extra_model_info.tensor_names:
+        t_hash = hash_string(t)
+        tensor_proto = load_proto(os.path.join(model_path, '{}.pbuf'.format(t_hash)), proto_type=TensorProto)
+        if t != tensor_proto.name:
+            raise RuntimeError("Loaded the wrong tensor! Meant to load: {} did load: {} read file: {}".format(t, tensor_proto.name, t_hash))
+        tensors[t] = tensor_proto_to_numpy_array(tensor_proto)
+    return tensors

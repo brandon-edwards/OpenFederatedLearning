@@ -41,7 +41,19 @@ def remove_and_save_holdout_tensors(tensor_dict):
         return shared_tensors, holdout_tensors
 
 
-def main(plan, model_weights_filename, native_model_weights_filepath, populate_weights_at_init, model_file_argument_name, data_dir, logging_config_path, logging_default_level, logging_directory, model_device, inference_patient=None):
+def main(plan, 
+         model_weights_filename, 
+         native_model_weights_filepath, 
+         populate_weights_at_init, 
+         model_file_argument_name, 
+         data_dir, 
+         logging_config_path, 
+         logging_default_level, 
+         logging_directory, 
+         model_device, 
+         inference_patient,
+         patient_id, WORKING HERE
+         outputs_folder=None):
     """Runs the inference according to the flplan, data-dir and weights file. Output format is determined by the data object in the flplan
 
     Args:
@@ -53,7 +65,9 @@ def main(plan, model_weights_filename, native_model_weights_filepath, populate_w
         data_dir (string)                       : The directory path for the parent directory containing the data. Path will be relative to the working directory.
         logging_config_fname (string)           : The log file
         logging_default_level (string)          : The log level
-        inference_patient (string)              : Subdirectory of single patient to run inference on (exclusively)
+        inference_patient (string)              : Subdirectory of single patient to run inference on 
+        outputs_folder (string)                 : Directory into which final inference outputs and other byproducts will be written
+        patient_id (string)                     : unique integer identifying inference patient
 
     """
 
@@ -66,6 +80,12 @@ def main(plan, model_weights_filename, native_model_weights_filepath, populate_w
     setup_logging(path=logging_config_path, default_level=logging_default_level, logging_directory=logging_directory)
 
     flplan = parse_fl_plan(os.path.join(plan_dir, plan))
+
+    # outputs in the logging directory if not explicitly provided
+    if outputs_folder is None:
+        outputs_folder = logging_directory
+
+    flplan['model_object_init']['init_kwargs']['outputs_folder'] = outputs_folder
 
     # check the inference config
     if 'inference' not in flplan:
@@ -119,7 +139,7 @@ def main(plan, model_weights_filename, native_model_weights_filepath, populate_w
        
     # finally, call the model object's run_inference_and_store_results with the kwargs from the inference block
     inference_kwargs = flplan['inference'].get('kwargs') or {}
-    model.run_inference_and_store_results(**inference_kwargs)
+    model.run_inference_and_store_results(patient_id=inference_patient[1], **inference_kwargs)
 
 
 if __name__ == '__main__':
@@ -138,5 +158,6 @@ if __name__ == '__main__':
     # FIXME: this kind of commandline configuration needs to be done in a consistent way
     parser.add_argument('--model_device', '-md', type=str, default='cpu')
     parser.add_argument('--inference_patient', '-ip', type=str, default=None)
+    parser.add_argument('--outputs_folder', '-of', type=str, default=None)
     args = parser.parse_args()
     main(**vars(args))
