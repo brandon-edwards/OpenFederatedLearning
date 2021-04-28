@@ -91,6 +91,7 @@ class Aggregator(object):
         self.collaborator_sleep_time = collaborator_sleep_time
         self.enrollment_period = enrollment_period
         self.enrolled = []
+        self.connected_this_round = []
 
         self.model_selection_val_keys = model_selection_val_keys
 
@@ -376,6 +377,9 @@ class Aggregator(object):
         # set enrolled list to blank
         self.enrolled = []
 
+        # set the connected list to blank
+        self.connected_this_round = []
+
         # if we have enabled runtime configuration updates, do that now
         if self.runtime_aggregator_config_dir is not None:
             self.update_config_from_filesystem()
@@ -545,6 +549,11 @@ class Aggregator(object):
 
         # check enrollment
         self.check_enrollment(collaborator)
+
+        # check if this is the first connection from this collaborator this round
+        if collaborator not in self.connected_this_round:
+            self.connected_this_round.append(collaborator)
+            self.logger.info("First connection from {} for round {}".format(collaborator, self.round_num))
 
         reply = self.determine_next_job(message)
 
