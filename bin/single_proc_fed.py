@@ -47,6 +47,10 @@ def federate(flplan,
     # create the compressor
     compression_pipeline = create_compression_pipeline(flplan)
 
+    # if we have not already specified minimum_reporting in the plan, set to number of collaborators
+    if flplan['aggregator_object_init']['init_kwargs'].get('minimum_reporting') is None:
+        flplan['aggregator_object_init']['init_kwargs']['minimum_reporting'] = len(collaborator_common_names)
+
     # create the aggregator
     aggregator = create_aggregator_object_from_flplan(flplan,
                                                       collaborator_common_names,
